@@ -4,9 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Онбординг NVEX tech</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..1000;1,9..40,300..1000&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/fonts.css">
 <style>
   :root{
     --blue:#BBDD88;          /* NVEX lime */
@@ -654,7 +652,14 @@
   }
   .topbar .bar{flex:1}
   .topbar .step-count{font-size:13px;font-weight:600;color:var(--ink-soft);white-space:nowrap}
-  .content{flex:1;overflow-y:auto;padding:92px 30px 40px;scroll-behavior:smooth}
+  .content{flex:1;overflow-y:auto;overflow-x:hidden;padding:92px 30px 40px}
+  html,body{overflow-x:hidden;max-width:100%}
+  .main,#onboarding{max-width:100vw;overflow-x:hidden}
+  .stage,.slide-card,.q-card{max-width:100%;box-sizing:border-box}
+  /* decorative bleed must never create a scrollbar */
+  .lesson-decor{overflow:hidden}
+  /* keep last content clear of the fixed admin bar */
+  body.admin.in-app .content{padding-bottom:96px}
   .content-inner{max-width:none;margin:0}
   .stage>*{opacity:0;transform:translateY(18px);filter:blur(6px);animation:stg .55s cubic-bezier(.2,.8,.2,1) forwards}
   .stage>*:nth-child(1){animation-delay:.04s}
@@ -989,13 +994,13 @@
   }
   /* ===== start button: tall, brand, calm ===== */
   .btn-start{
-    padding:22px 40px;border-radius:16px;
-    font-size:14.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;
+    padding:15px 28px;border-radius:12px;
+    font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;
   }
   .bs-enter{
-    margin-left:4px;padding:6px 11px;border-radius:8px;
+    margin-left:3px;padding:4px 8px;border-radius:6px;
     background:rgba(16,21,12,.16);border:1px solid rgba(16,21,12,.18);
-    font:700 11px/1 ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
+    font:700 8px/1 ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
     letter-spacing:.08em;color:#10150C;
   }
   /* ===== magicui-inspired: border beam (login card) ===== */
@@ -2049,7 +2054,8 @@ async function afterLogin(user, {playIntro}={}){
         .catch(()=>$('#intro').classList.add('done'));
     },900);
   } else {
-    show('#onboarding'); render();
+    show('#onboarding');
+    if(!restoreView()) render();   // land exactly where the user left off
   }
 }
 
@@ -2216,14 +2222,14 @@ let subPhrase=-1;
 /* Movie-trailer reveal: words emerge one by one and stay; always two balanced rows.
    Driven from the orb's rAF loop (60fps) — timeupdate alone fires ~4Hz and made words pop in bursts. */
 const KEY_WORDS=new Set(['NVEX.','компанією,','процесами','тест,','найважливіше.']);
-function splitTwoRows(words){
-  const total=words.reduce((n,[w])=>n+w.length+1,0);
-  let acc=0,cut=words.length;
-  for(let i=0;i<words.length;i++){
-    acc+=words[i][0].length+1;
-    if(acc>=total/2){ cut=i+1; break; }
-  }
-  return [words.slice(0,cut),words.slice(cut)];
+// split a phrase into balanced rows of at most 5 words each
+function splitRows(words){
+  const MAX=5;
+  const rowCount=Math.max(1,Math.ceil(words.length/MAX));
+  const per=Math.ceil(words.length/rowCount);   // even distribution, still ≤5
+  const rows=[];
+  for(let i=0;i<words.length;i+=per) rows.push(words.slice(i,i+per));
+  return rows;
 }
 function updateSubs(){
   if(!$('#intro').classList.contains('playing')) return;
@@ -2233,9 +2239,8 @@ function updateSubs(){
   const words=SUBS[pi].w;
   if(subsEl._pi!==pi){
     subsEl._pi=pi;
-    const [r1,r2]=splitTwoRows(words);
     const row=ws=>`<span class="sub-row">${ws.map(([w])=>`<span class="swm"><span class="sw ${KEY_WORDS.has(w)?'key':''}">${w}</span></span>`).join('')}</span>`;
-    subsEl.innerHTML=row(r1)+(r2.length?row(r2):'');
+    subsEl.innerHTML=splitRows(words).map(row).join('');
     subsEl._spans=subsEl.querySelectorAll('.sw');
   }
   let wi=-1;
@@ -2388,7 +2393,36 @@ content.addEventListener('scroll',()=>{
   if(!_plxRaf){_plxRaf=true;requestAnimationFrame(runPlx)}
   const max=content.scrollHeight-content.clientHeight;
   _readBar.style.width=max>40?(content.scrollTop/max*100).toFixed(1)+'%':'0%';
+  saveView();
 },{passive:true});
+
+/* --- remember exact spot so a refresh stays put (per-user) --- */
+const VIEW_KEY='nvex_view';
+let _viewT;
+function saveView(){
+  if(!NVEX.user || !$('#onboarding').classList.contains('active')) return;
+  clearTimeout(_viewT);
+  _viewT=setTimeout(()=>{
+    try{ localStorage.setItem(VIEW_KEY, JSON.stringify({
+      uid:NVEX.user.id, chapter:state.chapter,
+      mode:state.mode==='result'?'lesson':state.mode,   // result needs live answers → fall back to lesson
+      scroll:content.scrollTop|0
+    })); }catch(_){}
+  },250);
+}
+function restoreView(){
+  try{
+    const v=JSON.parse(localStorage.getItem(VIEW_KEY)||'null');
+    if(!v || v.uid!==NVEX.user.id) return false;
+    const ch=Math.max(0,Math.min(v.chapter|0, state.unlocked, CHAPTERS.length-1));
+    state.chapter=ch;
+    state.mode=(v.mode==='quiz')?'quiz':'lesson';
+    render();
+    if(v.scroll>0) setTimeout(()=>{ content.scrollTop=v.scroll; },1000);
+    return true;
+  }catch(_){ return false; }
+}
+
 let lastChapter=-1;
 function render(){ renderSidebar(); updateProgress();
   const chapterChanged=state.chapter!==lastChapter;
@@ -2401,6 +2435,7 @@ function render(){ renderSidebar(); updateProgress();
   }
   else if(state.mode==='quiz'){ transition(dec+quizHTML()); buddySay(pick(BUDDY_QUIZ),'think'); }
   else transition(dec+resultHTML());
+  saveView();
 }
 
 function dotsHTML(){
