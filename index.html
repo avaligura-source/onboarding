@@ -288,6 +288,14 @@
   .forgot{font-size:13.5px;font-weight:600;color:var(--blue);cursor:pointer}
   .forgot:hover{text-decoration:underline}
   .sess-lock{width:11px;height:11px;stroke:currentColor;margin-right:5px;vertical-align:-1px}
+  #continueAs{
+    width:100%;margin-top:12px;padding:12px;border-radius:12px;cursor:pointer;
+    background:var(--blue-soft);color:var(--blue);border:1px solid rgba(187,221,136,.25);
+    font-size:13.5px;font-weight:600;font-family:inherit;transition:background var(--t);
+  }
+  #continueAs:hover{background:#1E3A26}
+  #continueAs:active{transform:scale(.98)}
+  #continueAs b{font-weight:700}
   @media (max-width:960px){ .login-hero{display:none} .login-wrap{padding:0} }
 
   /* ===== admin mode ===== */
@@ -1166,6 +1174,7 @@
       <button class="btn btn-block" type="submit">Увійти
         <svg class="arr" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </button>
+      <button type="button" id="continueAs" hidden>Продовжити як <b></b> &rarr;</button>
       <p class="login-sess"><svg class="sess-lock" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="10" rx="3"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>SESSION <span id="sessId">····</span> · ENCRYPTED</p>
     </form>
   </div>
@@ -2092,11 +2101,21 @@ async function saveProgress(chapter, passed, score, total){
 }
 async function logout(){ try{ await sb.auth.signOut(); }catch(_){} location.reload(); }
 
-/* --- restore session on load (returning users skip login) --- */
+/* --- on load: a real F5 keeps you in place, opening the link shows the home screen --- */
 (async ()=>{
   try{
+    const nav=(performance.getEntriesByType('navigation')[0]||{}).type;
     const { data:{ session } } = await sb.auth.getSession();
-    if(session){ await afterLogin(session.user, {playIntro:false}); }
+    if(!session) return;                       // not logged in → login screen
+    if(nav==='reload'){ await afterLogin(session.user,{playIntro:false}); return; }
+    // fresh open: stay on the home (login) screen, offer a one-click continue
+    try{ localStorage.removeItem(VIEW_KEY); }catch(_){}
+    const c=$('#continueAs');
+    if(c){
+      c.querySelector('b').textContent=session.user.email;
+      c.hidden=false;
+      c.addEventListener('click',async()=>{ await afterLogin(session.user,{playIntro:true}); });
+    }
   }catch(_){}
 })();
 /* --- Composing orb (thinking-orbs "ribbon" mode, NVEX-tinted, audio-reactive) --- */
@@ -2490,7 +2509,8 @@ function lessonHTML(){
       <div class="slide-nav">
         ${state.chapter>0?`<button class="btn btn-ghost" id="prevBtn">&larr;&nbsp; Назад</button>`:'<span style="width:110px"></span>'}
         ${dotsHTML()}
-        <button class="btn" id="toQuizBtn">Далі&nbsp; &rarr;</button>
+        ${isAdmin()?`<button class="btn btn-ghost" id="admNextCh">${state.chapter===CHAPTERS.length-1?'На початок':'Наступний розділ'}&nbsp; &rarr;</button>`:''}
+        <button class="btn" id="toQuizBtn">${isAdmin()?'До тесту':'Далі'}&nbsp; &rarr;</button>
       </div>
     </div>
   </div>`;
