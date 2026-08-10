@@ -2055,12 +2055,15 @@ async function afterLogin(user, {playIntro}={}){
     },900);
   } else {
     show('#onboarding');
-    // only an actual page REFRESH restores the exact spot (chapter+mode+scroll);
-    // a fresh open / new tab lands cleanly at the start of the current chapter
+    // F5 on an open session → stay exactly where you were.
+    // Opening the link anew (new tab / bookmark / closed-and-reopened) → start from the top.
     const nav=(performance.getEntriesByType('navigation')[0]||{}).type;
-    const isReload = nav==='reload' || nav==='back_forward';
+    const isReload = nav==='reload';
     if(isReload && restoreView()){ /* stayed put */ }
-    else { state.mode='lesson'; render(); }
+    else {
+      try{ localStorage.removeItem(VIEW_KEY); }catch(_){}
+      state.chapter=0; state.mode='lesson'; render();
+    }
   }
 }
 
@@ -2075,6 +2078,8 @@ async function loadProgress(){
     while(state.chapter<CHAPTERS.length && state.doneChapters.has(state.chapter)) state.chapter++;
     if(state.chapter>=CHAPTERS.length) state.chapter=CHAPTERS.length-1;
   }catch(_){}
+  // admins review content freely: every chapter open, nothing gated by quizzes
+  if(isAdmin()){ state.unlocked=CHAPTERS.length-1; state.chapter=0; }
 }
 async function saveProgress(chapter, passed, score, total){
   if(!NVEX.user || isAdmin()) return;   // admins previewing don't record progress
@@ -2517,6 +2522,7 @@ function quizHTML(){
       <button class="btn btn-ghost" id="backLessonBtn">&larr;&nbsp; Назад</button>
       ${dotsHTML()}
       <button class="btn" id="submitQuiz">Надіслати&nbsp; &rarr;</button>
+      ${isAdmin()?`<button class="btn" id="admNextCh">${state.chapter===CHAPTERS.length-1?'На початок':'Наступний розділ'}&nbsp; &rarr;</button>`:''}
     </div>
     </div>
   </div>`;
@@ -2627,6 +2633,12 @@ function bind(){
   if(next) next.addEventListener('click',()=>{
     if(state.chapter===CHAPTERS.length-1){ finish(); return; }
     state.chapter++; state.mode='lesson'; render();
+  });
+  // admin: move through chapters without taking the quiz
+  const admNext=$('#admNextCh');
+  if(admNext) admNext.addEventListener('click',()=>{
+    state.chapter = state.chapter===CHAPTERS.length-1 ? 0 : state.chapter+1;
+    state.mode='lesson'; render();
   });
   initDock();
   initTilt();
