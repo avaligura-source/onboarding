@@ -87,14 +87,6 @@
     border:1px solid var(--line);border-radius:24px;
     padding:36px 40px 30px;box-shadow:var(--shadow-lg);
   }
-  /* fine details: soft glow behind the mascot */
-  .login-mascot::before{
-    content:'';position:absolute;width:110px;height:110px;left:50%;top:44%;
-    transform:translate(-50%,-50%);border-radius:50%;z-index:-1;
-    background:radial-gradient(circle,rgba(187,221,136,.14),transparent 70%);
-    animation:mGlow 4s ease-in-out infinite;
-  }
-  @keyframes mGlow{0%,100%{opacity:.7;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.12)}}
   /* fine details: breathing brand dot in the logo */
   .login-logo .dot{display:inline-block;animation:dotPulse 2.6s ease-in-out infinite}
   @keyframes dotPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.35)}}
@@ -164,7 +156,6 @@
   .login-card>*:nth-child(7){animation-delay:.47s}
   .login-card>*:nth-child(8){animation-delay:.54s}
   @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
-  .login-mascot{position:relative;margin:-52px 0 6px;filter:drop-shadow(0 12px 24px rgba(0,0,0,.4))}
   .login-logo{font-size:24px;margin-bottom:22px}
   .login-title{font-size:26px;font-weight:700;letter-spacing:-.02em;margin-bottom:8px}
   .login-sub{font-size:15px;color:var(--ink-soft);margin-bottom:10px}
@@ -954,35 +945,19 @@
   #confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
 
   /* ============ MASCOT ============ */
-  .mascot{display:inline-block;line-height:0}
-  .mascot svg{overflow:visible}
-  .m-eyes{transform-box:fill-box;transform-origin:center;animation:mblink 4.2s infinite}
-  @keyframes mblink{0%,94%,100%{transform:scaleY(1)}96%,98%{transform:scaleY(.08)}}
-  .m-wing-l{transform-box:fill-box;transform-origin:top right}
-  .m-wing-r{transform-box:fill-box;transform-origin:top left}
-  .mascot.cheer .m-wing-l{animation:wavL .7s ease-in-out infinite}
-  .mascot.cheer .m-wing-r{animation:wavR .7s ease-in-out infinite}
-  @keyframes wavL{0%,100%{transform:rotate(22deg)}50%{transform:rotate(46deg)}}
-  @keyframes wavR{0%,100%{transform:rotate(-22deg)}50%{transform:rotate(-46deg)}}
-  .mascot.bounce{animation:mbounce .6s cubic-bezier(.2,.8,.2,1)}
-  @keyframes mbounce{0%{transform:scale(1)}35%{transform:scale(1.14) rotate(-4deg)}70%{transform:scale(.96) rotate(3deg)}100%{transform:scale(1)}}
-  .login-mascot{margin-bottom:18px;animation:float 4s ease-in-out infinite}
-
-  #buddy{
-    position:absolute;right:28px;bottom:24px;z-index:20;
-    display:flex;flex-direction:column;align-items:flex-end;gap:10px;
-    pointer-events:none;
-  }
-  #buddy .mascot{filter:drop-shadow(0 8px 20px rgba(0,0,0,.35));animation:float 4.5s ease-in-out infinite;pointer-events:auto;cursor:pointer}
-  .buddy-bubble{
-    max-width:240px;background:rgba(29,34,32,.82);backdrop-filter:blur(16px) saturate(150%);-webkit-backdrop-filter:blur(16px) saturate(150%);border:1px solid rgba(255,255,255,.1);
-    border-radius:16px 16px 4px 16px;padding:12px 15px;
-    font-size:13px;line-height:1.5;color:var(--ink);box-shadow:var(--shadow-md);
-    opacity:0;transform:translateY(8px) scale(.95);transform-origin:bottom right;
-    transition:opacity .35s ease,transform .35s cubic-bezier(.2,.8,.2,1);
-  }
-  .buddy-bubble.show{opacity:1;transform:none}
-  @media (max-width:860px){#buddy{display:none}}
+  /* ===== neutral interactive face (login) ===== */
+  .face{width:96px;height:96px;position:relative}
+  .face svg{width:100%;height:100%;display:block;filter:drop-shadow(0 10px 24px rgba(0,0,0,.45))}
+  #faceEyes{transition:transform .12s ease-out}
+  #faceLids{transform:translateY(-19px);transition:transform .22s var(--ease-out)}
+  .face.shut #faceLids{transform:translateY(0)}
+  .face.shut #faceMouth{d:path("M42 68 Q50 65 58 68")}
+  #faceMouth{transition:d .25s ease}
+  .face.nod{animation:faceNod .5s var(--ease-out)}
+  @keyframes faceNod{0%,100%{transform:translateY(0)}45%{transform:translateY(-6px)}}
+  /* blink */
+  @keyframes faceBlink{0%,94%,100%{transform:translateY(-19px)}96%,98%{transform:translateY(0)}}
+  .face:not(.shut) #faceLids{animation:faceBlink 5.5s infinite}
 
   /* toast */
   .toast{
@@ -1099,18 +1074,18 @@
   /* ===== §14 reduced motion & accessibility (apple-design) ===== */
   @media (prefers-reduced-motion: reduce){
     .cube,.dec-cube,.halo,.orbit,.od,.spark,.eq span,.intro-orb,.intro-video,
-    .warp-cube,.warp-streak,.wipe-num,.wipe-dot,.mascot,.m-wing-l,.m-wing-r,.aurora i,.meteor,.sparkle-wrap i,.login-card::after,.btn-shimmer::before,
+    .warp-cube,.warp-streak,.wipe-num,.wipe-dot,#faceLids,.face,.aurora i,.meteor,.sparkle-wrap i,.login-card::after,.btn-shimmer::before,
     .login-card>*,.hairline,.login-card::before{animation:none!important}
     .stage>*{animation:none!important;opacity:1!important;transform:none!important;filter:none!important}
     .media-frame,.tour-window,.q-card,.slide-card{transform:none!important}
     .content{scroll-behavior:auto}
-    .buddy-bubble,.toast,.tour-tip{transition:opacity .2s ease!important;transform:none!important}
+    .toast,.tour-tip{transition:opacity .2s ease!important;transform:none!important}
     .subs .sw{transition:none}
   }
   @media (prefers-reduced-transparency: reduce){
     .topbar{background:#181C1B;backdrop-filter:none;-webkit-backdrop-filter:none}
     .login-card{background:#1D2220;backdrop-filter:none;-webkit-backdrop-filter:none}
-    .buddy-bubble,.tour-tip,.toast,#admBar{backdrop-filter:none;-webkit-backdrop-filter:none;background:#1B201E}
+    .tour-tip,.toast,#admBar{backdrop-filter:none;-webkit-backdrop-filter:none;background:#1B201E}
   }
   @media (prefers-contrast: more){
     .slide-card,.q-card,.field input,.opt{border-color:rgba(255,255,255,.35)}
@@ -1149,8 +1124,24 @@
       <div class="hero-help" onclick="toast('Питання по онбордингу — пиши в #help-it у Slack')"><span class="hf-ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M9.5 9a2.5 2.5 0 1 1 3.2 2.4c-.5.2-.7.6-.7 1.1v.5"/><path d="M12 16h.01"/></svg></span><div><b>Виникло питання?</b><small>Пиши в #help-it — команда підкаже</small></div><svg class="hh-arr" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
     </div>
     <form class="login-card" id="loginForm" novalidate>
-      <div class="login-mascot" id="loginMascot" style="display:none"></div>
-      <div class="login-avatar"><span class="av-ring"></span><span class="av-ring r2"></span><div class="av-core"><svg viewBox="0 0 120 120"><defs><linearGradient id="lag" x1="0" y1="0" x2=".35" y2="1"><stop offset="0" stop-color="#D3ECA6"/><stop offset="1" stop-color="#6FA845"/></linearGradient></defs><g fill="url(#lag)"><circle cx="60" cy="60" r="18"/><rect x="46" y="2" width="28" height="64" rx="14"/><rect x="46" y="2" width="28" height="64" rx="14" transform="rotate(120 60 60)"/><rect x="46" y="2" width="28" height="64" rx="14" transform="rotate(240 60 60)"/></g></svg></div></div>
+      <div class="login-avatar">
+        <span class="av-ring"></span><span class="av-ring r2"></span>
+        <div class="face" id="face">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <circle cx="50" cy="50" r="46" fill="#20261F"/>
+            <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(187,221,136,.18)" stroke-width="1.5"/>
+            <g id="faceEyes">
+              <g class="eye"><circle cx="36" cy="46" r="7.5" fill="#BBDD88"/></g>
+              <g class="eye"><circle cx="64" cy="46" r="7.5" fill="#BBDD88"/></g>
+            </g>
+            <g id="faceLids">
+              <rect x="26" y="30" width="20" height="17" rx="3" fill="#20261F"/>
+              <rect x="54" y="30" width="20" height="17" rx="3" fill="#20261F"/>
+            </g>
+            <path id="faceMouth" d="M40 66 Q50 71 60 66" stroke="rgba(187,221,136,.55)" stroke-width="3" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
       <h1 class="login-title">Ласкаво просимо</h1>
       <p class="login-sub">Увійдіть у свій акаунт, щоб продовжити</p>
       <div class="f-row"><span class="f-lab">Робочий email</span><span class="f-tag">EMAIL · 01</span></div>
@@ -1228,10 +1219,6 @@
       <div class="wipe" id="wipe"></div>
     </div>
   </div>
-  <div id="buddy">
-    <div class="buddy-bubble" id="buddyBubble"></div>
-    <div id="buddyBody"></div>
-  </div>
 </section>
 
 <!-- ============ FINAL ============ -->
@@ -1246,7 +1233,6 @@
   <span class="meteor" style="left:82%;top:-4%;--md:6.8s;--mdel:-1.2s"></span>
   <span class="meteor" style="left:50%;top:10%;--md:7.4s;--mdel:-4.8s"></span>
   <div class="finale-inner">
-    <div class="trophy" id="finaleMascot"></div>
     <h1><span class="sparkle-wrap">Вітаємо!<i></i><i></i><i></i></span></h1>
     <p class="sub">Ти успішно пройшов онбординг NVEX.</p>
     <div class="finale-stats">
@@ -1289,80 +1275,6 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 /* =================== MASCOT: Jay the robin =================== */
-function mascotSVG(mood='happy', size=96){
-  // Stacky — the NVEX tri-jack character. mood: happy | cheer | think | sad | shy
-  const uid='mg'+(mascotSVG._n=(mascotSVG._n||0)+1);
-  const po = {think:[-3.5,-2], sad:[0,2.5], happy:[0,0], cheer:[0,-1.5], shy:[0,0]}[mood]||[0,0];
-  const mouth = mood==='cheer'
-    ? `<path d="M47 47 Q60 62 73 47 Q60 53 47 47 Z" fill="#0E1D10"/><ellipse cx="60" cy="53" rx="7" ry="4" fill="#BBDD88"/>`
-    : mood==='sad'
-    ? `<path d="M51 53 Q60 46 69 53" stroke="#0E1D10" stroke-width="3.5" fill="none" stroke-linecap="round"/>`
-    : mood==='shy'
-    ? `<path d="M53 49 Q60 55 67 49" stroke="#0E1D10" stroke-width="3.5" fill="none" stroke-linecap="round"/>`
-    : `<path d="M49 47 Q60 58 71 47 Q60 52 49 47 Z" fill="#0E1D10"/><ellipse cx="60" cy="51" rx="5.5" ry="3" fill="#BBDD88"/>`;
-  const brows = mood==='sad'
-    ? `<path d="M43 25 L54 29" stroke="#123018" stroke-width="3.5" stroke-linecap="round"/><path d="M77 25 L66 29" stroke="#123018" stroke-width="3.5" stroke-linecap="round"/>`
-    : mood==='think'
-    ? `<path d="M44 26 Q49 22 54 25" stroke="#123018" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M66 28 Q71 26 76 28" stroke="#123018" stroke-width="3.5" fill="none" stroke-linecap="round"/>`
-    : `<path d="M44 26 Q49 22 54 25" stroke="#123018" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M66 25 Q71 22 76 26" stroke="#123018" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
-  const eyes = mood==='shy'
-    ? `<path d="M45 36 q5 5 11 0" stroke="#0E1D10" stroke-width="3.5" fill="none" stroke-linecap="round"/>
-       <path d="M64 36 q5 5 11 0" stroke="#0E1D10" stroke-width="3.5" fill="none" stroke-linecap="round"/>`
-    : `<g class="m-pup-g">
-         <circle cx="${50+po[0]}" cy="${36+po[1]}" r="7.5" fill="#0A1209"/>
-         <circle cx="${70+po[0]}" cy="${36+po[1]}" r="7.5" fill="#0A1209"/>
-         <circle cx="${52.6+po[0]}" cy="${33.2+po[1]}" r="2.8" fill="#fff"/>
-         <circle cx="${72.6+po[0]}" cy="${33.2+po[1]}" r="2.8" fill="#fff"/>
-         <circle cx="${47.8+po[0]}" cy="${38.4+po[1]}" r="1.3" fill="rgba(255,255,255,.7)"/>
-         <circle cx="${67.8+po[0]}" cy="${38.4+po[1]}" r="1.3" fill="rgba(255,255,255,.7)"/>
-       </g>`;
-  const sparkle = mood==='cheer'
-    ? `<g fill="#BBDD88"><circle cx="12" cy="28" r="3"/><circle cx="108" cy="24" r="2.5"/><circle cx="104" cy="50" r="2"/><path d="M18 10 l2.2 5 5 2.2 -5 2.2 -2.2 5 -2.2 -5 -5 -2.2 5 -2.2 Z"/></g>`
-    : '';
-  const armUp = mood==='cheer';
-  // gloved hands: thumbs-up on the left for happy/cheer
-  const gloveL = (mood==='happy'||mood==='cheer')
-    ? `<path d="M14 ${armUp?46:62} q-2 -9 4 -10 q1 -6 5 -1 l0 6 q6 -1 7 5 q0 7 -8 8 q-7 0 -8 -8 Z" fill="#F4F0FA"/>`
-    : `<circle cx="19" cy="66" r="8" fill="#F4F0FA"/>`;
-  const gloveR = `<circle cx="101" cy="${armUp?48:66}" r="8" fill="#F4F0FA"/>`;
-  return `<span class="mascot ${mood}"><svg width="${size}" height="${size}" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Стекі — маскот NVEX">
-    <defs>
-      <linearGradient id="${uid}" x1="0" y1="0" x2=".3" y2="1">
-        <stop offset="0" stop-color="#A9D96E"/><stop offset=".5" stop-color="#5FA83C"/><stop offset="1" stop-color="#2C6B2F"/>
-      </linearGradient>
-    </defs>
-    ${sparkle}
-    <!-- legs & sneakers -->
-    <path d="M48 96 L46 104 M72 96 L74 104" stroke="#0D120E" stroke-width="5" stroke-linecap="round"/>
-    <g>
-      <path d="M34 104 q0 -6 8 -6 q8 0 9 6 l0 5 l-17 0 Z" fill="#08351B"/>
-      <rect x="33" y="108" width="19" height="4.5" rx="2.2" fill="#F4F0FA"/>
-      <path d="M63 104 q0 -6 8 -6 q8 0 9 6 l0 5 l-17 0 Z" fill="#08351B"/>
-      <rect x="62" y="108" width="19" height="4.5" rx="2.2" fill="#F4F0FA"/>
-    </g>
-    <!-- arms -->
-    <path class="m-wing-l" d="M32 70 Q22 68 20 ${armUp?52:62}" stroke="#0D120E" stroke-width="4.5" fill="none" stroke-linecap="round"/>
-    <path class="m-wing-r" d="M88 70 Q98 68 100 ${armUp?54:62}" stroke="#0D120E" stroke-width="4.5" fill="none" stroke-linecap="round"/>
-    ${gloveL}${gloveR}
-    <!-- tri-jack body -->
-    <g transform="rotate(-4 60 58)">
-      <circle cx="60" cy="58" r="21" fill="url(#${uid})"/>
-      <rect x="43" y="0" width="34" height="68" rx="17" fill="url(#${uid})"/>
-      <rect x="43" y="0" width="34" height="68" rx="17" fill="url(#${uid})" transform="rotate(120 60 58)"/>
-      <rect x="43" y="0" width="34" height="68" rx="17" fill="url(#${uid})" transform="rotate(240 60 58)"/>
-      <!-- slot grooves -->
-      <rect x="57.5" y="7" width="5" height="16" rx="2.5" fill="rgba(8,53,27,.5)"/>
-      <rect x="57.5" y="10" width="5" height="32" rx="2.5" fill="rgba(8,53,27,.5)" transform="rotate(120 60 58)"/>
-      <rect x="57.5" y="10" width="5" height="32" rx="2.5" fill="rgba(8,53,27,.5)" transform="rotate(240 60 58)"/>
-      <!-- sheen -->
-      <ellipse cx="51" cy="18" rx="9" ry="14" fill="rgba(255,255,255,.15)" transform="rotate(-10 51 18)"/>
-    </g>
-    <!-- face -->
-    <g class="m-eyes">${eyes}</g>
-    ${brows}
-    ${mouth}
-  </svg></span>`;
-}
 </script>
 <div id="admBar"><span class="adm-dot"></span>Адмін
   <button id="admPeople">👥 Співробітники</button>
@@ -1614,7 +1526,6 @@ function initPractices(){
         panel.innerHTML=`<div class="prac-task"><span class="prac-count">1/${p.steps.length}</span><span class="prac-ask">${p.steps[0].ask}</span></div><div class="prac-fb"></div>`;
         wire();
       });
-      buddySay(flawless?'Бездоганне проходження! 🎯':'Практика робить майстра — спробуй пройти чисто!', flawless?'cheer':'happy',5000);
     }
     function wire(){
       block._count=panel.querySelector('.prac-count'); block._ask=panel.querySelector('.prac-ask'); block._fb=panel.querySelector('.prac-fb');
@@ -1931,120 +1842,64 @@ function toast(msg){
   clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2600);
 }
 
-/* =================== BUDDY (mascot companion) =================== */
-const buddyBody=$('#buddyBody'), buddyBubble=$('#buddyBubble');
-$('#loginMascot').innerHTML=mascotSVG('happy',72);
-
-function buddySet(mood){
-  buddyBody.innerHTML=mascotSVG(mood,88);
-  const m=buddyBody.querySelector('.mascot');
-  m.classList.add('bounce');
-  m.addEventListener('animationend',()=>m.classList.remove('bounce'),{once:true});
-  m.addEventListener('click',()=>buddySay(pick(BUDDY_CLICK),'cheer',4000));
-}
-function buddySay(msg,mood='happy',ttl=7000){
-  buddySet(mood);
-  buddyBubble.textContent=msg;
-  buddyBubble.classList.add('show');
-  clearTimeout(buddyBubble._h);
-  buddyBubble._h=setTimeout(()=>buddyBubble.classList.remove('show'),ttl);
-}
-const pick=a=>a[Math.random()*a.length|0];
-const BUDDY_LESSON=[
-  "Привіт! Я Стекі 👋 Не поспішай із цим розділом — потім буде квіз.",
-  "Новий розділ відкрито! Інтерактивні екрани варті кліку.",
-  "Читай уважно — кілька з цих деталей будуть у квізі 😉",
-  "Ти молодець. Цей розділ — гарне чтиво!"
-];
-const BUDDY_QUIZ=[
-  "Час квізу! Щоб відкрити наступний розділ, потрібні всі правильні відповіді.",
-  "У тебе все вийде. Все це було в розділі!",
-  "Без тиску — перескладати можна скільки завгодно."
-];
-const BUDDY_PASS=[
-  "Ідеальний результат! Вперед до наступного розділу 🎉",
-  "Красунчик! Я й не сумнівався.",
-  "Бездоганно! Тримай серію!"
-];
-const BUDDY_FAIL=[
-  "Майже! Переглянь пояснення нижче і спробуй ще раз.",
-  "Ще трошки! Швидке перечитування — і складеш на всі сто.",
-  "Не хвилюйся — усі колись помиляються. Перескладай, коли будеш готовий!"
-];
-const BUDDY_CLICK=[
-  "Пік! Потрібна підказка? Все у квізі — з тексту розділу.",
-  "Лоскотно!",
-  "Факт: я Стекі — джек NVEX. Фіолетовий, очевидно.",
-  "Продовжуй — ти ближче, ніж думаєш!"
-];
-const BUDDY_IDLE=[
-  "Я тут! Не поспішай.",
-  "Пс-с — інтерактивні екрани клікабельні.",
-  "Розминка? Я щойно. День ніг — усіх трьох."
-];
-
-/* --- mascot eye tracking (all mascots on screen follow the cursor) --- */
-let _mx=innerWidth/2,_my=innerHeight/2,_eyeRaf=false;
-addEventListener('mousemove',e=>{
-  _mx=e.clientX;_my=e.clientY;
-  if(!_eyeRaf){_eyeRaf=true;requestAnimationFrame(trackEyes)}
-});
+/* =================== NEUTRAL FACE (login) =================== */
+const faceEl=$('#face');
+let _fx=innerWidth/2,_fy=innerHeight/2,_faceRaf=false;
 function trackEyes(){
-  _eyeRaf=false;
-  document.querySelectorAll('.m-pup-g').forEach(g=>{
-    const r=g.getBoundingClientRect();
-    if(!r.width) return;
-    const dx=_mx-(r.left+r.width/2), dy=_my-(r.top+r.height/2);
-    const d=Math.hypot(dx,dy)||1, k=Math.min(3.4,d/36);
-    g.style.transform=`translate(${(dx/d*k).toFixed(1)}px,${(dy/d*k).toFixed(1)}px)`;
-  });
+  _faceRaf=false;
+  const g=document.getElementById('faceEyes');
+  if(!g||!faceEl) return;
+  const r=faceEl.getBoundingClientRect();
+  if(!r.width) return;
+  const dx=_fx-(r.left+r.width/2), dy=_fy-(r.top+r.height/2);
+  const d=Math.hypot(dx,dy)||1, k=Math.min(5,d/26);
+  g.style.transform=`translate(${(dx/d*k).toFixed(1)}px,${(dy/d*k).toFixed(1)}px)`;
 }
-
-/* --- idle behaviours: buddy doesn't just sit there --- */
-setInterval(()=>{
-  if(!$('#onboarding').classList.contains('active')) return;
-  const m=buddyBody.querySelector('.mascot'); if(!m) return;
-  if(buddyBubble.classList.contains('show')) return;
-  const r=Math.random();
-  if(r<.45){
-    m.classList.add('bounce');
-    m.addEventListener('animationend',()=>m.classList.remove('bounce'),{once:true});
-  } else if(r<.85){
-    const g=m.querySelector('.m-pup-g');
-    if(g){ g.style.transition='transform .3s'; g.style.transform='translate(-3px,-1px)';
-      setTimeout(()=>{g.style.transform='translate(3px,-1px)'},600);
-      setTimeout(()=>{g.style.transform='';g.style.transition=''},1200); }
-  } else {
-    buddySay(pick(BUDDY_IDLE),'happy',4500);
-  }
-},9000);
+addEventListener('mousemove',e=>{
+  _fx=e.clientX;_fy=e.clientY;
+  if(!_faceRaf){_faceRaf=true;requestAnimationFrame(trackEyes)}
+});
+// eyes shut / open
+function faceEyes(shut){ if(faceEl) faceEl.classList.toggle('shut',!!shut); }
+// no-op stubs so existing calls keep working after the mascot was removed
 
 /* =================== LOGIN =================== */
 const EMAIL_RE=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const emailIn=$('#email'), passIn=$('#password');
-function setLoginMascot(mood){
-  $('#loginMascot').innerHTML=mascotSVG(mood,72);
+
+/* while typing the email, the eyes follow the text you're typing */
+function eyesFollowCaret(input){
+  const r=input.getBoundingClientRect();
+  const cs=getComputedStyle(input);
+  const cv=eyesFollowCaret._c||(eyesFollowCaret._c=document.createElement('canvas'));
+  const ctx=cv.getContext('2d');
+  ctx.font=`${cs.fontSize} ${cs.fontFamily}`;
+  const w=ctx.measureText(input.value).width;
+  const padL=parseFloat(cs.paddingLeft)||0;
+  _fx=Math.min(r.right-8, r.left+padL+w);
+  _fy=r.top+r.height/2;
+  if(!_faceRaf){_faceRaf=true;requestAnimationFrame(trackEyes)}
 }
 emailIn.addEventListener('input',()=>{
   const ok=EMAIL_RE.test(emailIn.value.trim());
   const was=$('#emailField').classList.contains('ok');
   $('#emailField').classList.toggle('ok',ok);
   $('#emailField').classList.remove('error');
+  eyesFollowCaret(emailIn);
   if(ok&&!was){
-    setLoginMascot('cheer');
-    const m=$('#loginMascot .mascot'); m.classList.add('bounce');
-    setTimeout(()=>{ if(document.activeElement!==passIn) setLoginMascot('happy'); },1200);
+    faceEl.classList.remove('nod'); void faceEl.offsetWidth; faceEl.classList.add('nod');
   }
 });
+emailIn.addEventListener('focus',()=>{ faceEyes(false); eyesFollowCaret(emailIn); });
 /* Jay politely looks away while you type your password */
-passIn.addEventListener('focus',()=>setLoginMascot('shy'));
-passIn.addEventListener('blur',()=>setLoginMascot('happy'));
+passIn.addEventListener('focus',()=>faceEyes(true));
+passIn.addEventListener('blur',()=>faceEyes(false));
 passIn.addEventListener('input',()=>$('#passField').classList.remove('error'));
 $('#peekBtn').addEventListener('click',()=>{
   const showing=passIn.type==='text';
   passIn.type=showing?'password':'text';
   passIn.focus();
-  setLoginMascot(showing?'shy':'think'); // peeking? Jay side-eyes you
+  faceEyes(!showing ? false : true);   // revealing the password? open up again
 });
 /* live HUD readouts: UTC clock, latency jitter, session id */
 (()=>{
@@ -2497,9 +2352,8 @@ function render(){ renderSidebar(); updateProgress();
   if(state.mode==='lesson'){
     const c=CHAPTERS[state.chapter];
     transition(dec+lessonHTML(), chapterChanged?{num:state.chapter+1,icon:c.icon,title:c.title}:null);
-    buddySay(pick(BUDDY_LESSON),'happy');
   }
-  else if(state.mode==='quiz'){ transition(dec+quizHTML()); buddySay(pick(BUDDY_QUIZ),'think'); }
+  else if(state.mode==='quiz'){ transition(dec+quizHTML()); }
   else transition(dec+resultHTML());
   saveView();
 }
@@ -2674,7 +2528,6 @@ function bind(){
     }
     saveProgress(state.chapter, passed, correct, c.quiz.length);
     state.mode='result'; render();
-    buddySay(pick(passed?BUDDY_PASS:BUDDY_FAIL), passed?'cheer':'sad');
   });
 
   const next=$('#nextChapterBtn');
@@ -2907,7 +2760,6 @@ $('#apAdd').addEventListener('submit',async e=>{
 
 /* =================== FINALE + CONFETTI =================== */
 function finish(){
-  $('#finaleMascot').innerHTML=mascotSVG('cheer',84);
   show('#finale');
   confetti();
 }
