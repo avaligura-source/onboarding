@@ -306,7 +306,50 @@
     background:rgba(255,255,255,.12);color:#fff;transition:background var(--t);
   }
   #admBar button:hover{background:rgba(255,255,255,.24)}
-  #admBar button.exit{background:var(--blue)}
+  #admBar button.exit{background:var(--blue);color:#10150C}
+  /* ===== admin panel ===== */
+  #adminPanel{
+    display:none;position:fixed;inset:0;z-index:80;padding:40px 20px;overflow-y:auto;
+    background:rgba(10,13,11,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  }
+  #adminPanel.open{display:flex;align-items:flex-start;justify-content:center}
+  .ap-card{
+    width:min(900px,100%);background:var(--card,#1B1F1E);border:1px solid var(--line);
+    border-radius:20px;box-shadow:0 24px 60px rgba(0,0,0,.5);padding:26px 28px 30px;
+  }
+  .ap-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px}
+  .ap-head h2{font-size:22px;font-weight:800;color:var(--ink)}
+  .ap-head p{font-size:13px;color:var(--ink-soft);margin-top:4px}
+  .ap-close{width:34px;height:34px;border-radius:10px;background:var(--bg-soft);color:var(--ink);font-size:15px;cursor:pointer;flex-shrink:0}
+  .ap-close:hover{background:#2a302c}
+  .ap-add{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+  .ap-add input{
+    flex:1;min-width:120px;padding:11px 14px;border-radius:11px;border:1px solid var(--line);
+    background:var(--bg-deep);color:var(--ink);font-size:14px;font-family:inherit;
+  }
+  .ap-add input:focus{outline:none;border-color:var(--blue)}
+  .ap-gen{padding:0 13px;border-radius:11px;background:var(--bg-soft);font-size:16px;cursor:pointer}
+  .ap-gen:hover{background:#2a302c}
+  .ap-addbtn{padding:11px 18px;border-radius:11px;background:var(--grad);color:#10150C;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap}
+  .ap-addbtn:active{transform:scale(.97)}
+  .ap-note{font-size:13px;min-height:18px;margin:6px 2px 16px}
+  .ap-note.ok{color:#8FD9A8}
+  .ap-note.err{color:#F87171}
+  .ap-tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px}
+  .ap-table{width:100%;border-collapse:collapse;font-size:13.5px}
+  .ap-table th{text-align:left;padding:11px 14px;color:var(--ink-faint);font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid var(--line);white-space:nowrap}
+  .ap-table td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.05);color:var(--ink);vertical-align:middle}
+  .ap-table tr:last-child td{border-bottom:0}
+  .ap-emp b{display:block;font-weight:600}
+  .ap-emp small{color:var(--ink-faint)}
+  .ap-badge{display:inline-block;padding:2px 9px;border-radius:99px;background:var(--blue-soft);color:var(--blue);font-size:11px;font-weight:700;margin-left:6px}
+  .ap-prog{display:flex;align-items:center;gap:9px;min-width:130px}
+  .ap-prog .bar{flex:1;height:6px;border-radius:99px;background:var(--bg-soft);overflow:hidden}
+  .ap-prog .bar i{display:block;height:100%;background:var(--grad);border-radius:99px}
+  .ap-prog span{font-size:12px;color:var(--ink-soft);width:34px;text-align:right}
+  .ap-reset{padding:6px 11px;border-radius:8px;background:var(--bg-soft);color:var(--ink-soft);font-size:12px;cursor:pointer;white-space:nowrap}
+  .ap-reset:hover{background:#2a302c;color:var(--ink)}
+  .ap-empty{padding:26px;text-align:center;color:var(--ink-faint);font-size:14px}
   .adm-edit{outline:1.5px dashed rgba(187,221,136,.5);outline-offset:4px;border-radius:6px;cursor:text;min-height:1em}
   .adm-edit:focus{outline:2px solid var(--blue);outline-offset:4px}
   .adm-bar{
@@ -1307,12 +1350,38 @@ function mascotSVG(mood='happy', size=96){
   </svg></span>`;
 }
 </script>
-<div id="admBar"><span class="adm-dot"></span>Адмін-режим
-  <button id="admExport">💾 Експорт content.json</button>
-  <button id="admReset">↺ Скинути зміни</button>
+<div id="admBar"><span class="adm-dot"></span>Адмін
+  <button id="admPeople">👥 Співробітники</button>
+  <button id="admExport">💾 content.json</button>
+  <button id="admReset">↺ Скинути</button>
   <button id="admExit" class="exit">Вийти</button>
 </div>
+
+<!-- ============ ADMIN PANEL ============ -->
+<div id="adminPanel">
+  <div class="ap-card">
+    <div class="ap-head">
+      <div><h2>Співробітники</h2><p id="apStat">Завантаження…</p></div>
+      <button class="ap-close" id="apClose" aria-label="Закрити">✕</button>
+    </div>
+    <form class="ap-add" id="apAdd">
+      <input type="email" id="apEmail" placeholder="пошта співробітника" autocomplete="off" required>
+      <input type="text" id="apName" placeholder="ім'я (необов'язково)" autocomplete="off">
+      <input type="text" id="apPass" placeholder="пароль" autocomplete="off" required>
+      <button type="button" class="ap-gen" id="apGen" title="Згенерувати пароль">🎲</button>
+      <button type="submit" class="ap-addbtn">➕ Додати</button>
+    </form>
+    <div class="ap-note" id="apNote"></div>
+    <div class="ap-tablewrap">
+      <table class="ap-table">
+        <thead><tr><th>Співробітник</th><th>Прогрес</th><th>Розділи</th><th>Активність</th><th></th></tr></thead>
+        <tbody id="apRows"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
 <audio id="narration" src="onboarding.mp3?v=2" preload="auto"></audio>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 /* =================== DATA =================== */
@@ -1762,9 +1831,15 @@ const CHAPTERS = [
 }
 ];
 
+/* =================== SUPABASE =================== */
+const SB_URL='https://rgcptdzetmsvkwupxaer.supabase.co';
+const SB_KEY='sb_publishable_ymGD3wTyGmW7GylZBcSSjg_QddbdQWV';
+const sb = window.supabase.createClient(SB_URL, SB_KEY);
+const NVEX = { user:null, role:'employee' };
+
 /* =================== ADMIN + CONTENT OVERRIDES =================== */
-const ADMIN_KEY='bs_admin', CONTENT_KEY='bs_content';
-const isAdmin=()=>localStorage.getItem(ADMIN_KEY)==='1';
+const CONTENT_KEY='bs_content';
+const isAdmin=()=> NVEX.role==='admin';
 function snapshotContent(){
   return {chapters:CHAPTERS.map(c=>({title:c.title,lead:c.lead,body:c.body,media:c.media,quiz:c.quiz}))};
 }
@@ -1938,7 +2013,7 @@ $('#peekBtn').addEventListener('click',()=>{
   },1000);
 })();
 
-$('#loginForm').addEventListener('submit',e=>{
+$('#loginForm').addEventListener('submit',async e=>{
   e.preventDefault();
   const email=$('#email'), pass=$('#password');
   let ok=true;
@@ -1947,21 +2022,67 @@ $('#loginForm').addEventListener('submit',e=>{
   const passOk=pass.value.trim().length>0;
   $('#passField').classList.toggle('error',!passOk); ok=ok&&passOk;
   if(!ok) return;
-  const adminLogin=/^admin@/i.test(email.value.trim());
-  if(adminLogin){ localStorage.setItem(ADMIN_KEY,'1'); document.body.classList.add('admin'); toast('Вхід як адміністратор ✓'); }
-  else { localStorage.removeItem(ADMIN_KEY); document.body.classList.remove('admin'); }
-  // start audio inside the click gesture so autoplay is permitted
-  show('#intro');
-  orbAudioHook();
-  setTimeout(()=>{
-    audio.play().then(()=>{
-      $('#intro').classList.add('playing');
-    }).catch(()=>{
-      // autoplay blocked fallback: reveal the button immediately
-      $('#intro').classList.add('done');
-    });
-  },900);
+  const btn=$('#loginForm .btn-block'); btn.disabled=true; btn.style.opacity=.7;
+  const { data, error } = await sb.auth.signInWithPassword({ email:email.value.trim(), password:pass.value });
+  btn.disabled=false; btn.style.opacity='';
+  if(error){
+    $('#passField').classList.add('error');
+    toast(error.message.match(/invalid/i) ? 'Невірна пошта або пароль' : 'Не вдалося увійти: '+error.message);
+    return;
+  }
+  await afterLogin(data.user, {playIntro:true});
 });
+
+/* --- shared post-login flow --- */
+async function afterLogin(user, {playIntro}={}){
+  NVEX.user=user;
+  try{
+    const { data:prof } = await sb.from('profiles').select('role,full_name').eq('id',user.id).single();
+    NVEX.role = prof?.role || 'employee';
+  }catch(_){ NVEX.role='employee'; }
+  document.body.classList.toggle('admin', NVEX.role==='admin');
+  await loadProgress();
+  if(playIntro){
+    show('#intro'); orbAudioHook();
+    setTimeout(()=>{
+      audio.play().then(()=>$('#intro').classList.add('playing'))
+        .catch(()=>$('#intro').classList.add('done'));
+    },900);
+  } else {
+    show('#onboarding'); render();
+  }
+}
+
+/* --- progress persistence --- */
+async function loadProgress(){
+  state.doneChapters=new Set(); state.unlocked=0; state.chapter=0;
+  if(!NVEX.user) return;
+  try{
+    const { data } = await sb.from('progress').select('chapter,passed').eq('user_id',NVEX.user.id);
+    (data||[]).forEach(r=>{ if(r.passed){ state.doneChapters.add(r.chapter); state.unlocked=Math.max(state.unlocked,r.chapter+1); } });
+    // resume at first not-yet-passed chapter
+    while(state.chapter<CHAPTERS.length && state.doneChapters.has(state.chapter)) state.chapter++;
+    if(state.chapter>=CHAPTERS.length) state.chapter=CHAPTERS.length-1;
+  }catch(_){}
+}
+async function saveProgress(chapter, passed, score, total){
+  if(!NVEX.user || isAdmin()) return;   // admins previewing don't record progress
+  try{
+    await sb.from('progress').upsert(
+      { user_id:NVEX.user.id, chapter, passed, score, total, updated_at:new Date().toISOString() },
+      { onConflict:'user_id,chapter' }
+    );
+  }catch(_){}
+}
+async function logout(){ try{ await sb.auth.signOut(); }catch(_){} location.reload(); }
+
+/* --- restore session on load (returning users skip login) --- */
+(async ()=>{
+  try{
+    const { data:{ session } } = await sb.auth.getSession();
+    if(session){ await afterLogin(session.user, {playIntro:false}); }
+  }catch(_){}
+})();
 /* --- Composing orb (thinking-orbs "ribbon" mode, NVEX-tinted, audio-reactive) --- */
 const orb={t:0,last:0,lvl:0,kick:0,raf:0,analyser:null,fdata:null};
 function fibDir(i,n){
@@ -2442,11 +2563,13 @@ function bind(){
     if(prac && prac.dataset.done!=='1'){ toast('Спершу виконай практичне завдання'); prac.scrollIntoView({behavior:'smooth',block:'center'}); return; }
     if(state.answers.some(a=>a===null)){ toast('Дай відповіді на всі питання перед надсиланням'); return; }
     const c=CHAPTERS[state.chapter];
-    const passed=state.answers.every((a,i)=>a===c.quiz[i].a);
+    const correct=state.answers.filter((a,i)=>a===c.quiz[i].a).length;
+    const passed=correct===c.quiz.length;
     if(passed){
       state.doneChapters.add(state.chapter);
       state.unlocked=Math.max(state.unlocked,state.chapter+1);
     }
+    saveProgress(state.chapter, passed, correct, c.quiz.length);
     state.mode='result'; render();
     buddySay(pick(passed?BUDDY_PASS:BUDDY_FAIL), passed?'cheer':'sad');
   });
@@ -2603,8 +2726,74 @@ $('#admReset').addEventListener('click',()=>{
   if(!confirm('Скинути всі локальні зміни контенту?')) return;
   localStorage.removeItem(CONTENT_KEY); location.reload();
 });
-$('#admExit').addEventListener('click',()=>{
-  localStorage.removeItem(ADMIN_KEY); location.reload();
+$('#admExit').addEventListener('click',logout);
+
+/* =================== ADMIN PANEL: employees & monitoring =================== */
+const adminPanel=$('#adminPanel');
+$('#admPeople').addEventListener('click',()=>{ adminPanel.classList.add('open'); loadEmployees(); });
+$('#apClose').addEventListener('click',()=>adminPanel.classList.remove('open'));
+adminPanel.addEventListener('click',e=>{ if(e.target===adminPanel) adminPanel.classList.remove('open'); });
+
+function apNote(msg,cls){ const n=$('#apNote'); n.textContent=msg||''; n.className='ap-note'+(cls?' '+cls:''); }
+function timeAgo(ts){
+  if(!ts) return '—';
+  const d=(Date.now()-new Date(ts).getTime())/1000;
+  if(d<90) return 'щойно';
+  if(d<3600) return Math.round(d/60)+' хв тому';
+  if(d<86400) return Math.round(d/3600)+' год тому';
+  return Math.round(d/86400)+' дн тому';
+}
+async function loadEmployees(){
+  const rows=$('#apRows'), N=CHAPTERS.length;
+  rows.innerHTML=`<tr><td colspan="5" class="ap-empty">Завантаження…</td></tr>`;
+  const { data, error } = await sb.from('admin_overview').select('*').order('created_at');
+  if(error){ rows.innerHTML=`<tr><td colspan="5" class="ap-empty">Помилка: ${error.message}</td></tr>`; return; }
+  const people=data||[];
+  const done=people.filter(p=>p.chapters_done>=N).length;
+  $('#apStat').textContent=`${people.length} співробітник(ів) · ${done} завершили онбординг`;
+  if(!people.length){ rows.innerHTML=`<tr><td colspan="5" class="ap-empty">Ще немає співробітників. Додайте першого вище.</td></tr>`; return; }
+  rows.innerHTML=people.map(p=>{
+    const pct=Math.round((p.chapters_done||0)/N*100);
+    const isMe=p.id===NVEX.user.id;
+    return `<tr>
+      <td class="ap-emp"><b>${p.full_name||'—'}${p.role==='admin'?'<span class="ap-badge">адмін</span>':''}${isMe?'<span class="ap-badge">ви</span>':''}</b><small>${p.email}</small></td>
+      <td><div class="ap-prog"><div class="bar"><i style="width:${pct}%"></i></div><span>${pct}%</span></div></td>
+      <td>${p.chapters_done||0} / ${N}</td>
+      <td>${timeAgo(p.last_active)}</td>
+      <td>${isMe?'':`<button class="ap-reset" data-reset="${p.email}">Скинути пароль</button>`}</td>
+    </tr>`;
+  }).join('');
+  rows.querySelectorAll('[data-reset]').forEach(b=>b.addEventListener('click',async()=>{
+    if(!confirm('Надіслати лист для скидання пароля на '+b.dataset.reset+'?')) return;
+    const { error } = await sb.auth.resetPasswordForEmail(b.dataset.reset,{redirectTo:location.origin+location.pathname});
+    apNote(error?('Помилка: '+error.message):'Лист для скидання надіслано на '+b.dataset.reset, error?'err':'ok');
+  }));
+}
+// create a new employee via a throwaway client so the admin stays signed in
+async function addEmployee(email,password,fullName){
+  const tmp=window.supabase.createClient(SB_URL,SB_KEY,{auth:{storageKey:'nvex_tmp',persistSession:false,autoRefreshToken:false}});
+  const { error }=await tmp.auth.signUp({ email, password, options:{ data:{ full_name:fullName } } });
+  try{ await tmp.auth.signOut(); }catch(_){}
+  if(error) throw error;
+}
+$('#apGen').addEventListener('click',()=>{
+  const chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  let p=''; for(let i=0;i<10;i++) p+=chars[Math.floor(Math.random()*chars.length)];
+  $('#apPass').value=p;
+});
+$('#apAdd').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const email=$('#apEmail').value.trim(), name=$('#apName').value.trim(), pass=$('#apPass').value.trim();
+  if(pass.length<6){ apNote('Пароль має бути щонайменше 6 символів','err'); return; }
+  const btn=$('.ap-addbtn'); btn.disabled=true; apNote('Створюю акаунт…');
+  try{
+    await addEmployee(email,pass,name);
+    apNote(`✓ Створено: ${email} · пароль: ${pass}  — передайте співробітнику`,'ok');
+    $('#apEmail').value=''; $('#apName').value=''; $('#apPass').value='';
+    setTimeout(loadEmployees,600);
+  }catch(err){
+    apNote('Помилка: '+(err.message.match(/already/i)?'акаунт з такою поштою вже існує':err.message),'err');
+  }finally{ btn.disabled=false; }
 });
 
 /* =================== FINALE + CONFETTI =================== */
