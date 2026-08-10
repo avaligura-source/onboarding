@@ -2280,13 +2280,11 @@ const subsEl=$('#subs');
 const KEY_WORDS=new Set(['NVEX.','компанією,','процесами','тест,','найважливіше.']);
 // at most 5 words per row and at most 2 rows → a card shows at most 10 words
 const MAX_ROW=5, MAX_ROWS=2, MAX_CARD=MAX_ROW*MAX_ROWS;
-// split words into balanced rows of ≤5 (used inside one card, ≤2 rows)
+// always exactly 2 balanced rows (≤5 words each) so the block never changes height
 function splitRows(words){
-  const rowCount=Math.max(1,Math.min(MAX_ROWS,Math.ceil(words.length/MAX_ROW)));
-  const per=Math.ceil(words.length/rowCount);
-  const rows=[];
-  for(let i=0;i<words.length;i+=per) rows.push(words.slice(i,i+per));
-  return rows;
+  if(words.length<2) return [words,[]];
+  const per=Math.min(MAX_ROW,Math.ceil(words.length/2));
+  return [words.slice(0,per), words.slice(per)];
 }
 // pre-split every phrase into sequential cards of ≤10 words; each card gets its own time window
 const CARDS=[];
@@ -2307,8 +2305,8 @@ function updateSubs(){
   const words=CARDS[ci].w;
   if(subsEl._ci!==ci){
     subsEl._ci=ci;
-    const row=ws=>`<span class="sub-row">${ws.map(([w])=>`<span class="swm"><span class="sw ${KEY_WORDS.has(w)?'key':''}">${w}</span></span>`).join('')}</span>`;
-    subsEl.innerHTML=splitRows(words).map(row).join('');   // ≤2 rows, ≤5 words each
+    const row=ws=>`<span class="sub-row">${ws.length?ws.map(([w])=>`<span class="swm"><span class="sw ${KEY_WORDS.has(w)?'key':''}">${w}</span></span>`).join(''):'&nbsp;'}</span>`;
+    subsEl.innerHTML=splitRows(words).map(row).join('');   // always 2 rows, ≤5 words each
     subsEl._spans=subsEl.querySelectorAll('.sw');
   }
   let wi=-1;
