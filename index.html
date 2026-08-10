@@ -947,8 +947,15 @@
   .face svg{width:100%;height:100%;display:block;filter:drop-shadow(0 10px 24px rgba(0,0,0,.45))}
   #faceEyes{transition:transform .12s ease-out}
   #faceLids{transform:translateY(-19px);transition:transform .22s var(--ease-out)}
-  .face.shut #faceLids{transform:translateY(0)}
-  .face.shut #faceMouth{d:path("M42 68 Q50 65 58 68")}
+  /* peek-a-boo: hands come up over the eyes while you type */
+  #faceHands{transform:translateY(52px);transition:transform .34s var(--ease-out)}
+  .hand-l{transform-origin:24px 60px}
+  .hand-r{transform-origin:76px 60px}
+  .face.cover #faceHands{transform:translateY(0)}
+  .face.cover .hand-l{transform:rotate(-7deg)}
+  .face.cover .hand-r{transform:rotate(7deg)}
+  .hand-l,.hand-r{transition:transform .34s var(--ease-out)}
+  .face.cover #faceMouth{d:path("M42 68 Q50 64 58 68")}
   #faceMouth{transition:d .25s ease}
   .face.nod{animation:faceNod .5s var(--ease-out)}
   @keyframes faceNod{0%,100%{transform:translateY(0)}45%{transform:translateY(-6px)}}
@@ -1124,17 +1131,31 @@
       <div class="login-avatar">
         <div class="face" id="face">
           <svg viewBox="0 0 100 100" aria-hidden="true">
+            <defs><clipPath id="faceClip"><circle cx="50" cy="50" r="46"/></clipPath></defs>
             <circle cx="50" cy="50" r="46" fill="#20261F"/>
+            <g clip-path="url(#faceClip)">
+              <g id="faceEyes">
+                <circle cx="36" cy="46" r="7.5" fill="#BBDD88"/>
+                <circle cx="64" cy="46" r="7.5" fill="#BBDD88"/>
+              </g>
+              <g id="faceLids">
+                <rect x="26" y="30" width="20" height="17" rx="3" fill="#20261F"/>
+                <rect x="54" y="30" width="20" height="17" rx="3" fill="#20261F"/>
+              </g>
+              <path id="faceMouth" d="M40 66 Q50 71 60 66" stroke="rgba(187,221,136,.55)" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <!-- hands slide up from below and cover the eyes -->
+              <g id="faceHands">
+                <g class="hand hand-l">
+                  <rect x="13" y="33" width="33" height="30" rx="15" fill="#3A4A32"/>
+                  <path d="M23 37 v12 M30 36 v13 M37 37 v12" stroke="rgba(187,221,136,.32)" stroke-width="1.8" stroke-linecap="round"/>
+                </g>
+                <g class="hand hand-r">
+                  <rect x="54" y="33" width="33" height="30" rx="15" fill="#3A4A32"/>
+                  <path d="M64 37 v12 M71 36 v13 M78 37 v12" stroke="rgba(187,221,136,.32)" stroke-width="1.8" stroke-linecap="round"/>
+                </g>
+              </g>
+            </g>
             <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(187,221,136,.18)" stroke-width="1.5"/>
-            <g id="faceEyes">
-              <g class="eye"><circle cx="36" cy="46" r="7.5" fill="#BBDD88"/></g>
-              <g class="eye"><circle cx="64" cy="46" r="7.5" fill="#BBDD88"/></g>
-            </g>
-            <g id="faceLids">
-              <rect x="26" y="30" width="20" height="17" rx="3" fill="#20261F"/>
-              <rect x="54" y="30" width="20" height="17" rx="3" fill="#20261F"/>
-            </g>
-            <path id="faceMouth" d="M40 66 Q50 71 60 66" stroke="rgba(187,221,136,.55)" stroke-width="3" fill="none" stroke-linecap="round"/>
           </svg>
         </div>
       </div>
@@ -1856,7 +1877,7 @@ addEventListener('mousemove',e=>{
   if(!_faceRaf){_faceRaf=true;requestAnimationFrame(trackEyes)}
 });
 // eyes shut / open
-function faceEyes(shut){ if(faceEl) faceEl.classList.toggle('shut',!!shut); }
+function faceEyes(cover){ if(faceEl) faceEl.classList.toggle('cover',!!cover); }
 // no-op stubs so existing calls keep working after the mascot was removed
 
 /* =================== LOGIN =================== */
@@ -1886,7 +1907,8 @@ emailIn.addEventListener('input',()=>{
     faceEl.classList.remove('nod'); void faceEl.offsetWidth; faceEl.classList.add('nod');
   }
 });
-emailIn.addEventListener('focus',()=>{ faceEyes(false); eyesFollowCaret(emailIn); });
+emailIn.addEventListener('focus',()=>faceEyes(true));
+emailIn.addEventListener('blur',()=>faceEyes(false));
 /* Jay politely looks away while you type your password */
 passIn.addEventListener('focus',()=>faceEyes(true));
 passIn.addEventListener('blur',()=>faceEyes(false));
