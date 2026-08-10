@@ -2055,7 +2055,12 @@ async function afterLogin(user, {playIntro}={}){
     },900);
   } else {
     show('#onboarding');
-    if(!restoreView()) render();   // land exactly where the user left off
+    // only an actual page REFRESH restores the exact spot (chapter+mode+scroll);
+    // a fresh open / new tab lands cleanly at the start of the current chapter
+    const nav=(performance.getEntriesByType('navigation')[0]||{}).type;
+    const isReload = nav==='reload' || nav==='back_forward';
+    if(isReload && restoreView()){ /* stayed put */ }
+    else { state.mode='lesson'; render(); }
   }
 }
 
@@ -2218,29 +2223,38 @@ const SUBS=[
   {s:8.88,e:15.2,w:[["Після",8.88],["кожного",9.28],["розділу",9.76],["на",10.36],["тебе",10.68],["чекатиме",10.88],["короткий",11.54],["тест,",12.04],["щоб",12.66],["закріпити",12.86],["найважливіше.",13.58]]}
 ];
 const subsEl=$('#subs');
-let subPhrase=-1;
-/* Movie-trailer reveal: words emerge one by one and stay; always two balanced rows.
-   Driven from the orb's rAF loop (60fps) — timeupdate alone fires ~4Hz and made words pop in bursts. */
 const KEY_WORDS=new Set(['NVEX.','компанією,','процесами','тест,','найважливіше.']);
-// split a phrase into balanced rows of at most 5 words each
+// at most 5 words per row and at most 2 rows → a card shows at most 10 words
+const MAX_ROW=5, MAX_ROWS=2, MAX_CARD=MAX_ROW*MAX_ROWS;
+// split words into balanced rows of ≤5 (used inside one card, ≤2 rows)
 function splitRows(words){
-  const MAX=5;
-  const rowCount=Math.max(1,Math.ceil(words.length/MAX));
-  const per=Math.ceil(words.length/rowCount);   // even distribution, still ≤5
+  const rowCount=Math.max(1,Math.min(MAX_ROWS,Math.ceil(words.length/MAX_ROW)));
+  const per=Math.ceil(words.length/rowCount);
   const rows=[];
   for(let i=0;i<words.length;i+=per) rows.push(words.slice(i,i+per));
   return rows;
 }
+// pre-split every phrase into sequential cards of ≤10 words; each card gets its own time window
+const CARDS=[];
+SUBS.forEach(p=>{
+  const n=Math.max(1,Math.ceil(p.w.length/MAX_CARD));
+  const per=Math.ceil(p.w.length/n);
+  for(let i=0;i<p.w.length;i+=per){
+    const ws=p.w.slice(i,i+per);
+    const nextStart=p.w[i+per] ? p.w[i+per][1] : p.e;   // hand off to next card / phrase end
+    CARDS.push({ w:ws, s:ws[0][1], e:nextStart });
+  }
+});
 function updateSubs(){
   if(!$('#intro').classList.contains('playing')) return;
   const t=audio.currentTime;
-  const pi=SUBS.findIndex(p=>t>=p.s&&t<p.e);
-  if(pi<0) return;
-  const words=SUBS[pi].w;
-  if(subsEl._pi!==pi){
-    subsEl._pi=pi;
+  const ci=CARDS.findIndex(c=>t>=c.s&&t<c.e);
+  if(ci<0) return;
+  const words=CARDS[ci].w;
+  if(subsEl._ci!==ci){
+    subsEl._ci=ci;
     const row=ws=>`<span class="sub-row">${ws.map(([w])=>`<span class="swm"><span class="sw ${KEY_WORDS.has(w)?'key':''}">${w}</span></span>`).join('')}</span>`;
-    subsEl.innerHTML=splitRows(words).map(row).join('');
+    subsEl.innerHTML=splitRows(words).map(row).join('');   // ≤2 rows, ≤5 words each
     subsEl._spans=subsEl.querySelectorAll('.sw');
   }
   let wi=-1;
