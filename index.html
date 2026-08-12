@@ -1104,6 +1104,87 @@
     .tile:hover,.media-frame:hover,.sso:hover,.hero-help:hover{transform:none;box-shadow:var(--shadow-sm)}
     .opt:hover:not(:disabled){border-color:var(--line);background:var(--bg)}
   }
+  /* ===== paper sections — brand-site light cards on dark page ===== */
+  :root{
+    --paper:#E9F1D8;--paper-2:#F3F8E8;--paper-line:#D3DFBB;
+    --inkP:#152A1B;--inkP-soft:#41543F;--inkP-faint:#7C8B72;
+    --green-card:#1C3B26;
+  }
+  .slide-card{background:var(--paper);border-color:transparent}
+  .slide-card .eyebrow{
+    color:#4C8A3F;font-family:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:11px;letter-spacing:.18em;
+  }
+  .slide-card .ch-title{color:var(--inkP)}
+  .slide-card .t-accent{color:#3E7A2E}
+  .slide-card .ch-lead{color:var(--inkP-soft)}
+  .slide-card .ch-body p{color:#33463A}
+  .slide-card .ch-body strong{color:var(--inkP)}
+  .slide-card .ch-icon{background:var(--green-card)}
+  .slide-card .ch-icon svg{stroke:var(--blue)}
+  .slide-card .tile{background:var(--paper-2);border:1px solid var(--paper-line);box-shadow:none}
+  .slide-card .tile h4{color:var(--inkP)}
+  .slide-card .tile p{color:var(--inkP-soft)}
+  .slide-card .media-caption{color:var(--inkP-faint)}
+  /* quiz on paper */
+  .slide-card .q-card{background:var(--paper-2);border:1px solid var(--paper-line)}
+  .slide-card .q-num{color:#4C8A3F}
+  .slide-card .q-text{color:var(--inkP)}
+  .slide-card .opt{background:#FBFDF4;border-color:var(--paper-line);color:#22361F}
+  .slide-card .opt span{color:#22361F}
+  .slide-card .opt .radio{border-color:#A9BC91}
+  .slide-card .opt:hover:not(:disabled){border-color:#8FBF6A;background:#F2F8E2}
+  .slide-card .opt.selected{border-color:#4C8A3F;background:#E7F2CD}
+  .slide-card .opt.selected .radio{border-color:#4C8A3F}
+  .slide-card .opt.selected .radio::after{background:#4C8A3F}
+  .slide-card .opt.correct{border-color:#4C8A3F;background:#DFF0CB}
+  .slide-card .opt.wrong{border-color:#C4544A;background:#F6E0DB}
+  .slide-card .explain.ok{color:#2F6B2A}
+  .slide-card .explain.bad{color:#A33B31}
+  .slide-card .explain{color:#41543F}
+  .slide-card .quiz-result .score{color:#3E7A2E}
+  .slide-card .quiz-result p{color:var(--inkP-soft)}
+  /* nav strip on paper */
+  .slide-card .slide-nav{border-top:1px solid var(--paper-line)}
+  .slide-card .dot-step{background:#C6D4A8}
+  .slide-card .dot-step.done{background:#8FBF6A}
+  .slide-card .dot-step.cur{background:#3E7A2E}
+  .slide-card .dot-step:not(.locked):hover{background:#3E7A2E}
+  .slide-card .btn-ghost{border-color:#B9C7A0;color:#41543F;background:transparent}
+  .slide-card .btn-ghost:hover{background:#E0EBC5;color:var(--inkP);border-color:#A9BC91}
+  /* AE tools list on paper */
+  .slide-card .tl-row{background:var(--paper-2);border-color:var(--paper-line)}
+  .slide-card .tl-row:hover{border-color:#8FBF6A}
+  .slide-card .tl-ic{background:var(--green-card);color:var(--blue)}
+  .slide-card .tl-name b{color:var(--inkP)}
+  .slide-card .tl-name small{color:var(--inkP-faint)}
+  .slide-card .tl-cat{border-color:#C6D4A8;color:#5C6E52}
+  .slide-card .tl-ae{background:var(--green-card);color:var(--blue)}
+  .slide-card .tl-dl{background:#E0EBC5;color:#41543F}
+  .slide-card .tl-dl:hover{background:var(--green-card);color:var(--blue)}
+  /* tool page on paper */
+  .slide-card .tp-head h1{color:var(--inkP)}
+  .slide-card .tp-head small{color:var(--inkP-faint)}
+  .slide-card .tp-desc{color:#33463A}
+  .slide-card .tp-video{border-color:var(--paper-line)}
+  /* practice strip on paper */
+  .slide-card .prac-ask{color:var(--inkP)}
+  .slide-card .prac-count{background:var(--green-card);color:var(--blue)}
+  .slide-card .prac-fb.ok{color:#2F6B2A}
+  .slide-card .prac-fb{color:#A33B31}
+  .slide-card .prac-result .prac-score.good{color:#2F6B2A}
+  .slide-card .prac-result .prac-score.meh{color:#41543F}
+  /* admin controls on paper */
+  .slide-card .adm-add{border-color:#A9BC91}
+  .slide-card .adm-add .adm-lab{color:var(--inkP-faint)}
+  .slide-card .adm-bar button,.slide-card .adm-add button{background:#DDEBC2;color:#2F6B2A}
+  .slide-card .adm-bar button:hover,.slide-card .adm-add button:hover{background:#CFE3AC}
+  .slide-card .adm-bar button.del{background:#F6E0DB;color:#A33B31}
+  .slide-card .adm-edit{outline-color:rgba(76,138,63,.55)}
+  .slide-card .adm-correct-toggle{background:#E0EBC5;color:#5C6E52}
+  .slide-card .opt.adm-correct{border-color:#4C8A3F;background:#DFF0CB}
+  .slide-card .opt.adm-correct .adm-correct-toggle{background:#CFE9AF;color:#2F6B2A}
+
   /* ===== §14 reduced motion & accessibility (apple-design) ===== */
   @media (prefers-reduced-motion: reduce){
     .cube,.dec-cube,.halo,.orbit,.od,.spark,.eq span,.intro-orb,.intro-video,
@@ -2427,7 +2508,7 @@ function lessonHTML(){
       <div class="ch-icon">${ICONS[c.icon]}</div>
       <div class="slide-hero">
         <div class="slide-left">
-          <div class="eyebrow">Розділ ${state.chapter+1}</div>
+          <div class="eyebrow">0${state.chapter+1} · РОЗДІЛ</div>
           <h1 class="ch-title">${title}</h1>
           <p class="ch-lead">${c.lead}</p>
         </div>
@@ -2457,7 +2538,7 @@ function quizHTML(){
   return `<div class="stage content-inner">
     <div class="slide-card">
     <div class="quiz-head">
-      <div class="eyebrow">Розділ ${state.chapter+1} · Перевірка знань</div>
+      <div class="eyebrow">0${state.chapter+1} · ПЕРЕВІРКА ЗНАНЬ</div>
       <h1 class="ch-title">${c.title}</h1>
       <p class="ch-lead">${c.practice?'Виконай практичне завдання і дай відповіді на питання, щоб відкрити наступний розділ.':'Дай відповіді на питання нижче, щоб відкрити наступний розділ.'}</p>
     </div>
