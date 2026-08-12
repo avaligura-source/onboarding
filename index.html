@@ -1177,6 +1177,78 @@
   .slide-card .opt.adm-correct{border-color:#4C8A3F;background:#DFF0CB}
   .slide-card .opt.adm-correct .adm-correct-toggle{background:#CFE9AF;color:#2F6B2A}
 
+  /* ===== SaaS-style lesson & quiz components (paper palette) ===== */
+  .ls-toolbar{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    padding-bottom:18px;margin-bottom:26px;border-bottom:1px solid var(--paper-line);
+  }
+  .ls-crumb{display:flex;align-items:center;gap:12px}
+  .ch-icon.sm{width:34px;height:34px;border-radius:10px;margin:0;display:inline-flex;align-items:center;justify-content:center}
+  .ch-icon.sm svg{width:17px;height:17px}
+  .ls-meta{display:flex;gap:8px;flex-wrap:wrap}
+  .meta-chip{
+    padding:6px 12px;border-radius:8px;border:1px solid var(--paper-line);background:var(--paper-2);
+    font:600 11.5px/1 ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
+    letter-spacing:.04em;color:#4C6B4F;white-space:nowrap;
+  }
+  /* tighter, product-scale title */
+  .slide-card .ch-title{font-size:clamp(22px,2.6vw,30px);line-height:1.12;margin-bottom:14px}
+  .slide-card .ch-lead{font-size:15.5px;line-height:1.65;margin-bottom:24px}
+  /* tiles -> compact SaaS cards */
+  .slide-card .tile{border-radius:12px;padding:16px 18px;box-shadow:none}
+  .slide-card .tile h4{font-size:14px;margin-bottom:6px}
+  .slide-card .tile p{font-size:13.5px;line-height:1.55}
+  /* callout -> structured alert with label */
+  .slide-card .callout{border-radius:12px;border-left:4px solid var(--blue)}
+  .slide-card .callout>div::before{
+    content:'ПОРАДА';display:block;margin-bottom:6px;
+    font:700 10px/1 ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
+    letter-spacing:.16em;color:var(--blue);
+  }
+  /* quiz cards */
+  .slide-card .q-card{border-radius:14px;padding:22px 24px}
+  .slide-card .q-num{
+    display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border-radius:99px;
+    background:var(--green-card);color:var(--blue);
+    font:700 10.5px/1 ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.12em;
+    margin-bottom:14px;
+  }
+  .slide-card .q-text{font-size:16px;margin-bottom:16px}
+  .slide-card .opt{
+    border-radius:10px;padding:13px 16px;background:#FCFDF6;border:1px solid #DCE5C4;
+    position:relative;
+  }
+  .slide-card .opt .radio{width:18px;height:18px}
+  .slide-card .opt.selected{border:1.5px solid #4C8A3F;background:#EDF5D6}
+  .slide-card .opt.selected::after{
+    content:'✓';position:absolute;right:14px;top:50%;transform:translateY(-50%);
+    width:20px;height:20px;border-radius:50%;background:#4C8A3F;color:#F3F8E8;
+    font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;
+  }
+  .slide-card .opt.correct::after{
+    content:'✓';position:absolute;right:14px;top:50%;transform:translateY(-50%);
+    width:20px;height:20px;border-radius:50%;background:#4C8A3F;color:#F3F8E8;
+    font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;
+  }
+  .slide-card .opt.wrong::after{
+    content:'✕';position:absolute;right:14px;top:50%;transform:translateY(-50%);
+    width:20px;height:20px;border-radius:50%;background:#C4544A;color:#FBF3EF;
+    font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;
+  }
+  .slide-card .opt.adm-correct::after{content:none}
+  /* answered counter */
+  .ans-count{
+    font:600 11.5px/1 ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
+    letter-spacing:.05em;color:#4C6B4F;white-space:nowrap;
+  }
+  /* result: status badge + metric */
+  .res-badge{
+    display:inline-block;padding:7px 16px;border-radius:99px;margin-bottom:14px;
+    font-size:12.5px;font-weight:800;letter-spacing:.04em;
+  }
+  .res-badge.ok{background:var(--green-card);color:var(--blue)}
+  .res-badge.bad{background:#F1DCD6;color:#A33B31}
+
   /* ===== §14 reduced motion & accessibility (apple-design) ===== */
   @media (prefers-reduced-motion: reduce){
     .cube,.dec-cube,.halo,.orbit,.od,.spark,.eq span,.intro-orb,.intro-video,
@@ -2445,12 +2517,20 @@ function lessonHTML(){
   const tw=c.title.trim().split(' ');
   const accent=tw.pop();
   const title=`${tw.join(' ')} <span class="t-accent">${accent}</span>`;
+  const words=(c.lead+' '+c.body.replace(/<[^>]+>/g,' ')).split(/\s+/).length;
+  const mins=Math.max(2,Math.round(words/140));
   return `<div class="stage content-inner">
     <div class="slide-card">
-      <div class="ch-icon">${ICONS[c.icon]}</div>
+      <div class="ls-toolbar">
+        <div class="ls-crumb"><span class="ch-icon sm">${ICONS[c.icon]}</span><span class="eyebrow">0${state.chapter+1} · РОЗДІЛ</span></div>
+        <div class="ls-meta">
+          <span class="meta-chip">≈ ${mins} хв читання</span>
+          <span class="meta-chip">Тест · ${c.quiz.length} питань</span>
+          ${c.practice?'<span class="meta-chip">Практика</span>':''}
+        </div>
+      </div>
       <div class="slide-hero">
         <div class="slide-left">
-          <div class="eyebrow">0${state.chapter+1} · РОЗДІЛ</div>
           <h1 class="ch-title">${title}</h1>
           <p class="ch-lead">${c.lead}</p>
         </div>
@@ -2479,8 +2559,14 @@ function quizHTML(){
   state.answers=new Array(c.quiz.length).fill(null);
   return `<div class="stage content-inner">
     <div class="slide-card">
+    <div class="ls-toolbar">
+      <div class="ls-crumb"><span class="ch-icon sm">${ICONS[c.icon]}</span><span class="eyebrow">0${state.chapter+1} · ПЕРЕВІРКА ЗНАНЬ</span></div>
+      <div class="ls-meta">
+        <span class="meta-chip">${c.quiz.length} питань</span>
+        ${c.practice?'<span class="meta-chip">+ практичне завдання</span>':''}
+      </div>
+    </div>
     <div class="quiz-head">
-      <div class="eyebrow">0${state.chapter+1} · ПЕРЕВІРКА ЗНАНЬ</div>
       <h1 class="ch-title">${c.title}</h1>
       <p class="ch-lead">${c.practice?'Виконай практичне завдання і дай відповіді на питання, щоб відкрити наступний розділ.':'Дай відповіді на питання нижче, щоб відкрити наступний розділ.'}</p>
     </div>
@@ -2498,6 +2584,7 @@ function quizHTML(){
       </div>`).join('')}
     <div class="slide-nav">
       <button class="btn btn-ghost" id="backLessonBtn">&larr;&nbsp; Назад</button>
+      <span class="ans-count" id="ansCount">Відповідей: 0 із ${c.quiz.length}</span>
       ${dotsHTML()}
       <button class="btn" id="submitQuiz">Надіслати&nbsp; &rarr;</button>
       ${isAdmin()?`<button class="btn" id="admNextCh">${state.chapter===CHAPTERS.length-1?'На початок':'Наступний розділ'}&nbsp; &rarr;</button>`:''}
@@ -2514,6 +2601,7 @@ function resultHTML(){
   return `<div class="stage content-inner">
     <div class="slide-card">
     <div class="quiz-result">
+      <span class="res-badge ${passed?'ok':'bad'}">${passed?'✓ Складено':'Не складено'}</span>
       <div class="score" data-n="${correct}" data-total="${c.quiz.length}">0 / ${c.quiz.length}</div>
       <p>${passed
         ? (last?'Ідеально — це був останній розділ.':'Чудова робота — наступний розділ відкрито.')
@@ -2650,6 +2738,8 @@ function bind(){
         card.querySelectorAll('.opt').forEach(o=>o.classList.remove('selected'));
         opt.classList.add('selected');
         state.answers[+card.dataset.q]=+opt.dataset.o;
+        const ac=$('#ansCount');
+        if(ac) ac.textContent=`Відповідей: ${state.answers.filter(x=>x!==null).length} із ${state.answers.length}`;
       });
     });
   });
