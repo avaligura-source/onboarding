@@ -54,11 +54,6 @@
     font-weight:800;letter-spacing:-.02em;color:var(--ink);
     display:inline-flex;align-items:baseline;gap:2px;user-select:none;
   }
-  .wordmark::before{
-    content:'';align-self:center;width:.72em;height:.72em;margin-right:.24em;
-    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cdefs%3E%3ClinearGradient id='wg' x1='0' y1='0' x2='.35' y2='1'%3E%3Cstop offset='0' stop-color='%23E8F7C8'/%3E%3Cstop offset='.45' stop-color='%23BBDD88'/%3E%3Cstop offset='1' stop-color='%236FA845'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cg fill='url(%23wg)'%3E%3Ccircle cx='60' cy='60' r='18'/%3E%3Crect x='46' y='2' width='28' height='64' rx='14'/%3E%3Crect x='46' y='2' width='28' height='64' rx='14' transform='rotate(120 60 60)'/%3E%3Crect x='46' y='2' width='28' height='64' rx='14' transform='rotate(240 60 60)'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;
-    filter:drop-shadow(0 0 8px rgba(187,221,136,.4));
-  }
   .cube svg,.dec-cube svg{filter:drop-shadow(0 12px 28px rgba(0,0,0,.4))}
   .wordmark .dot{color:var(--blue)}
 
@@ -208,14 +203,11 @@
     gap:clamp(48px,7vw,110px);width:100%;max-width:1200px;padding:0 32px;
   }
   .login-hero{max-width:430px;display:flex;flex-direction:column;align-items:flex-start}
-  .hero-chip{
-    width:56px;height:56px;border-radius:16px;background:var(--bg);
-    box-shadow:var(--shadow-md);display:flex;align-items:center;justify-content:center;margin-bottom:28px;
-  }
-  .hero-chip svg{width:32px;height:32px}
   .hero-title{font-size:clamp(38px,4.6vw,56px);font-weight:800;line-height:1.03;letter-spacing:-.025em;color:var(--ink);text-transform:uppercase}
   .grad-text{color:var(--blue);font-style:italic}
   .hero-dot{color:var(--blue)}
+  .logo-lock{color:var(--blue);display:inline-flex;align-items:center;font-style:normal}
+  .logo-lock .tech-chip{font-size:.34em;vertical-align:baseline;transform:translateY(.08em)}
   .hero-sub{margin-top:14px;font-size:16px;color:var(--ink-soft)}
   .hero-feats{margin-top:34px;display:flex;flex-direction:column;gap:22px}
   .hero-feat{display:flex;align-items:center;gap:16px}
@@ -418,8 +410,6 @@
     transition:opacity 1s ease .25s,transform 1s cubic-bezier(.2,.8,.2,1) .25s;
   }
   #intro.active .intro-title{opacity:1;transform:none}
-  .intro-title .star{width:.5em;height:.5em;margin-left:.18em;vertical-align:.08em;animation:starTw 2.6s ease-in-out infinite}
-  @keyframes starTw{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.82)}}
   @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
   .halo{
     position:absolute;border-radius:50%;
@@ -662,7 +652,7 @@
   .plx-hide.plx-show{opacity:1!important;transform:none!important}
   .top-logo{font-size:17px;margin-right:10px;flex-shrink:0}
   .tech-chip{
-    display:inline-block;margin-left:6px;padding:1px 7px;border-radius:6px;
+    display:inline-block;margin-left:8px;padding:2px 10px;border-radius:7px;
     background:var(--blue);color:#10150C;font-size:.42em;font-weight:800;
     letter-spacing:.06em;text-transform:lowercase;vertical-align:.45em;
   }
@@ -1225,8 +1215,7 @@
   <div class="tech-grid"></div>
   <div class="login-wrap">
     <div class="login-hero">
-      <div class="hero-chip"><svg viewBox="0 0 120 120"><defs><linearGradient id="hcg" x1="0" y1="0" x2=".35" y2="1"><stop offset="0" stop-color="#D3ECA6"/><stop offset="1" stop-color="#6FA845"/></linearGradient></defs><g fill="url(#hcg)"><circle cx="60" cy="60" r="18"/><rect x="46" y="2" width="28" height="64" rx="14"/><rect x="46" y="2" width="28" height="64" rx="14" transform="rotate(120 60 60)"/><rect x="46" y="2" width="28" height="64" rx="14" transform="rotate(240 60 60)"/></g></svg></div>
-      <h1 class="hero-title">Вітаємо у<br><span class="grad-text">NVEX tech</span><span class="hero-dot">.</span></h1>
+      <h1 class="hero-title">Вітаємо у<br><span class="logo-lock">NVEX<span class="tech-chip">tech</span></span></h1>
       <p class="hero-sub">Увійди, щоб розпочати онбординг</p>
       <div class="hero-feats">
         <div class="hero-feat"><span class="hf-ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><div><b>Все, що потрібно знати на старті</b><small>Компанія, комунікація та процеси</small></div></div>
@@ -1325,7 +1314,7 @@
         <canvas id="orbCanvas" aria-hidden="true"></canvas>
       </div>
     </div>
-    <h1 class="intro-title">Вітаємо у<br><span class="grad-text">NVEX tech</span><span class="hero-dot">.</span><svg class="star" viewBox="0 0 24 24" fill="var(--blue)"><path d="M12 2l2.2 7.8L22 12l-7.8 2.2L12 22l-2.2-7.8L2 12l7.8-2.2Z"/></svg></h1>
+    <h1 class="intro-title">Вітаємо у<br><span class="logo-lock">NVEX<span class="tech-chip">tech</span></span></h1>
     <div class="eq"><span></span><span></span><span></span><span></span><span></span></div>
     <div class="subs" id="subs" aria-live="polite"></div>
     <p class="sound-hint"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14v-3a9 9 0 0 1 18 0v3"/><path d="M21 17a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h3zM3 17a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2H3z"/></svg><b>Увімкніть звук</b><span class="sep">·</span>щоб нічого не пропустити</p>
@@ -1388,27 +1377,20 @@
 <script>
 /* =================== BRAND CUBES =================== */
 function cubeSVG(kind='orange'){
-  // NVEX tri-jack: three rounded arms with slot grooves, 120° apart
-  const uid='bsg'+(cubeSVG._n=(cubeSVG._n||0)+1);
-  const arms=(fill)=>`
-    <circle cx="60" cy="60" r="18" fill="${fill}"/>
-    <rect x="46" y="2" width="28" height="64" rx="14" fill="${fill}"/>
-    <rect x="46" y="2" width="28" height="64" rx="14" fill="${fill}" transform="rotate(120 60 60)"/>
-    <rect x="46" y="2" width="28" height="64" rx="14" fill="${fill}" transform="rotate(240 60 60)"/>`;
-  const slots=(fill)=>`
-    <rect x="57" y="12" width="6" height="36" rx="3" fill="${fill}"/>
-    <rect x="57" y="12" width="6" height="36" rx="3" fill="${fill}" transform="rotate(120 60 60)"/>
-    <rect x="57" y="12" width="6" height="36" rx="3" fill="${fill}" transform="rotate(240 60 60)"/>`;
+  // Neutral brand shapes: glossy lime energy orb (accent) and a thin glass ring.
+  const uid='nvo'+(cubeSVG._n=(cubeSVG._n||0)+1);
   if(kind==='glass'){
     return `<svg viewBox="0 0 120 120" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      ${arms('rgba(140,160,140,.22)')}${slots('rgba(8,53,27,.35)')}
+      <circle cx="60" cy="60" r="42" fill="none" stroke="rgba(150,168,148,.30)" stroke-width="8"/>
+      <circle cx="60" cy="60" r="42" fill="none" stroke="rgba(255,255,255,.10)" stroke-width="2"/>
     </svg>`;
   }
   return `<svg viewBox="0 0 120 120" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <defs><linearGradient id="${uid}" x1="0" y1="0" x2=".35" y2="1">
-      <stop offset="0" stop-color="#E8F7C8"/><stop offset=".45" stop-color="#BBDD88"/><stop offset="1" stop-color="#6FA845"/>
-    </linearGradient></defs>
-    ${arms(`url(#${uid})`)}${slots('rgba(8,53,27,.45)')}
+    <defs><radialGradient id="${uid}" cx="35%" cy="28%" r="80%">
+      <stop offset="0" stop-color="#E8F7C8"/><stop offset=".55" stop-color="#BBDD88"/><stop offset="1" stop-color="#6FA845"/>
+    </radialGradient></defs>
+    <circle cx="60" cy="60" r="46" fill="url(#${uid})"/>
+    <ellipse cx="46" cy="40" rx="17" ry="11" fill="rgba(255,255,255,.32)"/>
   </svg>`;
 }
 document.addEventListener('DOMContentLoaded',()=>{
@@ -1816,50 +1798,6 @@ const CHAPTERS = [
   ]
 },
 {
-  title:"Наші продукти й команди",
-  icon:'grid',
-  lead:"Портфоліо NVEX охоплює утиліти, лайфстайл- і продуктивіті-застосунки. Кожен продукт веде крос-функціональна команда, що працює як маленький стартап усередині компанії.",
-  body:`<p>Типова продуктова команда — це <strong>продакт-менеджер, дизайнери, розробники, QA і маркетинг</strong>. Команди самі ставлять собі цілі відносно метрик компанії, а оцінюються за результатами продукту — ретеншн, дохід, задоволеність користувачів — а не за годинами чи обсягом роботи.</p>
-  <p>Поруч із продуктовими командами працюють <strong>платформні функції</strong> (аналітика, продакшн креативів, залучення користувачів, підтримка) — вони спільні для всіх продуктів.</p>
-  <div class="tiles">
-    <div class="tile"><h4>${ICONS.dot} Продуктові команди</h4><p>Володіють одним продуктом: роадмап, релізи, метрики, дохід.</p></div>
-    <div class="tile"><h4>${ICONS.dot} Платформні функції</h4><p>Аналітика, креативи, UA й підтримка — спільні для всіх продуктів.</p></div>
-  </div>
-  <div class="callout">${ICONS.info}<div>Не знаєш, хто за що відповідає? Спитай спершу в каналі продукту — він є в кожного, і мапа команди закріплена саме там.</div></div>`,
-  media:[
-    {type:'tour', tour:'org'},
-    {type:'anim', src:'', ph:'Огляд портфоліо продуктів', caption:'Швидкий тур портфоліо продуктів.'}
-  ],
-  quiz:[
-    {q:"Як оцінюються продуктові команди?", opts:["За залогованими годинами","За кількістю відвантажених фіч","За результатами продукту: ретеншн і дохід","За рядками коду"], a:2, why:"Результат важливіший за обсяг: рахуються ретеншн, дохід і задоволеність користувачів."},
-    {q:"Що таке платформні функції?", opts:["Команди, кожна з яких володіє одним продуктом","Спільні функції на кшталт аналітики й креативів для всіх продуктів","Зовнішні підрядники","Рада директорів"], a:1, why:"Платформні функції (аналітика, креативи, UA, підтримка) працюють на все портфоліо."},
-    {q:"Де спитати, якщо не знаєш, хто за що відповідає?", opts:["Написати CEO на пошту","У каналі продукту, де закріплена мапа команди","Чекати наступного all-hands","Вгадати й діяти"], a:1, why:"У кожного продукту є канал із закріпленою мапою команди — це найшвидший шлях."}
-  ]
-},
-{
-  title:"Як ми комунікуємо",
-  icon:'chat',
-  lead:"Ми async-first. Письмова, добре структурована комунікація перемагає мітинги — і дає людям у різних часових поясах працювати, не блокуючи одне одного.",
-  body:`<p><strong>Slack</strong> — основний канал щоденної комунікації, у <strong>Notion</strong> живе довгострокова документація й рішення, а <strong>мітинги — лише</strong> для обговорень, яким справді потрібна синхронність. Якщо рішення ухвалили на дзвінку — воно не фінальне, поки не записане.</p>
-  <div class="tiles">
-    <div class="tile"><h4>${ICONS.dot} Slack</h4><p>Щоденні апдейти й швидкі питання. За замовчуванням — публічні канали.</p></div>
-    <div class="tile"><h4>${ICONS.dot} Notion</h4><p>Специфікації, рішення, процеси. Якщо це важливо наступного місяця — воно тут.</p></div>
-    <div class="tile"><h4>${ICONS.dot} Мітинги</h4><p>Лише коли async не спрацює. Агенда до, письмове резюме після.</p></div>
-  </div>
-  <div class="callout">${ICONS.info}<div>Обирай публічні канали замість особистих — відповіді на публічні питання допоможуть наступному з таким самим питанням.</div></div>`,
-  practice:'slack',
-  media:[
-    {type:'tour', tour:'slack'},
-    {type:'image', src:'', ph:'Скрін простору Notion', caption:'Простір Notion: специфікації, рішення, процеси.'}
-  ],
-  quiz:[
-    {q:"Що означає async-first у NVEX?", opts:["Ніхто ніколи не зустрічається","Письмова комунікація за замовчуванням; мітинги — виняток","На всі повідомлення треба відповідати миттєво","Тільки менеджери можуть призначати дзвінки"], a:1, why:"За замовчуванням — структурована письмова комунікація; мітинги для того, що справді потребує живого обговорення."},
-    {q:"Де живуть довгострокові рішення і специфікації?", opts:["У тредах Slack","В особистих нотатках","У Notion","У поштових ланцюжках"], a:2, why:"Notion — дім для документації й рішень, важливих довше ніж сьогодні."},
-    {q:"Рішення ухвалили на дзвінку. Коли воно фінальне?", opts:["Одразу","Коли його записали","Після наступного спринту","Коли затвердить CEO"], a:1, why:"Що не записано — того не було: дзвінки фіналізуються письмово."},
-    {q:"Питати в особистих чи в публічних каналах?", opts:["Завжди в особистих, щоб не шуміти","У публічних каналах за замовчуванням","Лише на мітингах","Через анонімні форми"], a:1, why:"Публічні відповіді допомагають усім, хто зіткнеться з тим самим питанням."}
-  ]
-},
-{
   title:"Інструменти й процес",
   icon:'zap',
   lead:"Перший тиждень — це доступи та ритм роботи: як планується, трекається і релізиться робота.",
@@ -1931,7 +1869,7 @@ function snapshotContent(){
   return {chapters:CHAPTERS.map(c=>({title:c.title,lead:c.lead,body:c.body,media:c.media,quiz:c.quiz}))};
 }
 function applyContent(d){
-  if(!d||!Array.isArray(d.chapters)) return;
+  if(!d||!Array.isArray(d.chapters)||d.chapters.length!==CHAPTERS.length) return;
   d.chapters.forEach((ch,i)=>{
     if(!CHAPTERS[i]||!ch) return;
     ['title','lead','body'].forEach(k=>{ if(typeof ch[k]==='string') CHAPTERS[i][k]=ch[k]; });
