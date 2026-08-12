@@ -1379,20 +1379,27 @@
 <script>
 /* =================== BRAND CUBES =================== */
 function cubeSVG(kind='orange'){
-  // Neutral brand shapes: glossy lime energy orb (accent) and a thin glass ring.
-  const uid='nvo'+(cubeSVG._n=(cubeSVG._n||0)+1);
+  // Shapes drawn from the logo's own geometry:
+  //  - accent: the bold X glyph (two crossed rounded bars, lime gradient)
+  //  - glass:  the slanted "tech" plate (outlined parallelogram)
+  const uid='nvx'+(cubeSVG._n=(cubeSVG._n||0)+1);
   if(kind==='glass'){
     return `<svg viewBox="0 0 120 120" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <circle cx="60" cy="60" r="42" fill="none" stroke="rgba(150,168,148,.30)" stroke-width="8"/>
-      <circle cx="60" cy="60" r="42" fill="none" stroke="rgba(255,255,255,.10)" stroke-width="2"/>
+      <g transform="skewX(-12) translate(14 0)">
+        <rect x="18" y="38" width="76" height="44" rx="10" fill="rgba(194,220,146,.05)" stroke="rgba(160,180,150,.35)" stroke-width="5"/>
+        <rect x="32" y="55" width="34" height="10" rx="5" fill="rgba(160,180,150,.28)"/>
+      </g>
     </svg>`;
   }
   return `<svg viewBox="0 0 120 120" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <defs><radialGradient id="${uid}" cx="35%" cy="28%" r="80%">
-      <stop offset="0" stop-color="#E8F7C8"/><stop offset=".55" stop-color="#BBDD88"/><stop offset="1" stop-color="#6FA845"/>
-    </radialGradient></defs>
-    <circle cx="60" cy="60" r="46" fill="url(#${uid})"/>
-    <ellipse cx="46" cy="40" rx="17" ry="11" fill="rgba(255,255,255,.32)"/>
+    <defs><linearGradient id="${uid}" x1="0" y1="0" x2=".4" y2="1">
+      <stop offset="0" stop-color="#E4F3BE"/><stop offset=".55" stop-color="#C2DC92"/><stop offset="1" stop-color="#7FA457"/>
+    </linearGradient></defs>
+    <g>
+      <rect x="47" y="8" width="26" height="104" rx="13" fill="url(#${uid})" transform="rotate(45 60 60)"/>
+      <rect x="47" y="8" width="26" height="104" rx="13" fill="url(#${uid})" transform="rotate(-45 60 60)"/>
+      <rect x="50" y="14" width="8" height="34" rx="4" fill="rgba(255,255,255,.30)" transform="rotate(45 60 60)"/>
+    </g>
   </svg>`;
 }
 document.addEventListener('DOMContentLoaded',()=>{
