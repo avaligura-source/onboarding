@@ -1249,6 +1249,174 @@
   .res-badge.ok{background:var(--green-card);color:var(--blue)}
   .res-badge.bad{background:#F1DCD6;color:#A33B31}
 
+  /* ===== SaaS app shell: dark sidebar + light workspace ===== */
+  #onboarding{background:#EAEFDF}
+  .main{background:transparent}
+  .topbar{
+    position:absolute;top:0;left:0;right:0;z-index:6;display:flex;align-items:center;gap:14px;
+    padding:14px 28px;background:rgba(238,242,230,.86);
+    backdrop-filter:blur(14px) saturate(140%);-webkit-backdrop-filter:blur(14px) saturate(140%);
+    border-bottom:1px solid #DDE4CC;
+  }
+  .topbar::after{content:'';position:absolute;left:0;right:0;bottom:-14px;height:14px;pointer-events:none;background:linear-gradient(180deg,rgba(60,80,50,.08),transparent)}
+  #readBar{display:none}
+  .top-chip{
+    display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:10px;cursor:pointer;
+    background:#FFFFFF;border:1px solid #DDE4CC;color:#2B3A2C;font-size:13px;font-weight:600;
+    transition:border-color var(--t),background var(--t);
+  }
+  .top-chip:hover{border-color:#AFC38F}
+  .top-chip.exit{background:transparent}
+  .top-crumb{font-size:13px;font-weight:600;color:#5C6E52}
+  .content{padding:82px 28px 40px;background:transparent}
+  /* --- sidebar --- */
+  .sidebar{
+    display:flex!important;flex-direction:column;gap:18px;width:280px;flex-shrink:0;
+    background:#111812;padding:22px 18px;overflow-y:auto;
+  }
+  .side-logo-img{height:22px;width:auto;margin:2px 4px 6px;align-self:flex-start}
+  .sp-card{
+    display:flex;align-items:center;gap:14px;padding:16px;border-radius:16px;
+    background:#161F16;border:1px solid #223122;
+  }
+  .sp-ring{position:relative;width:58px;height:58px;flex-shrink:0}
+  .sp-ring svg{width:100%;height:100%}
+  #ringArc{transition:stroke-dashoffset .6s var(--ease-in-out)}
+  .sp-ring b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12.5px;color:#E8F0DC}
+  .sp-info{flex:1;min-width:0}
+  .sp-info b{display:block;font-size:13.5px;color:#E8F0DC;font-weight:700}
+  .sp-info small{display:block;margin:2px 0 8px;font-size:11.5px;color:#7C8B72}
+  .sp-info .bar{height:5px;border-radius:99px;background:#223122;overflow:hidden}
+  .sp-info .bar i{display:block;height:100%;width:0;background:var(--grad);border-radius:99px;transition:width .5s var(--ease-in-out)}
+  .sidebar .side-label{
+    font:700 10px/1 ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
+    letter-spacing:.18em;text-transform:uppercase;color:#5F6F5C;margin:6px 6px 0;
+  }
+  #chapterList{display:flex;flex-direction:column;gap:4px}
+  .chapter-item{
+    display:flex;align-items:center;gap:12px;width:100%;padding:12px 12px;border-radius:12px;
+    color:#93A48D;font-size:13.5px;font-weight:600;text-align:left;cursor:pointer;
+    transition:background var(--t),color var(--t);
+  }
+  .chapter-item:hover:not(.locked){background:#182218;color:#DCE8CC}
+  .chapter-item.current{background:#1B261B;color:#C2DC92}
+  .chapter-item.locked{opacity:.5;cursor:default}
+  .ch-num{font:700 11px/1 ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;color:#6F7F6C;width:20px}
+  .chapter-item.current .ch-num{color:#C2DC92}
+  .ch-t{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ch-state{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+  .ch-state svg{width:14px;height:14px;stroke:#6F7F6C}
+  .chapter-item.done .ch-state svg{stroke:#C2DC92}
+  .cur-dot{width:8px;height:8px;border-radius:50%;background:#C2DC92;box-shadow:0 0 8px rgba(194,220,146,.7)}
+  .tip-card{
+    margin-top:auto;padding:16px;border-radius:16px;background:#161F16;border:1px solid #223122;
+  }
+  .tip-card b{display:flex;align-items:center;gap:8px;font-size:13px;color:#C2DC92;margin-bottom:8px}
+  .tip-card p{font-size:12.5px;line-height:1.6;color:#93A48D}
+  /* --- lesson card on light --- */
+  .slide-card{background:#FBFCF4;border:1px solid #E3E9D3;box-shadow:0 1px 2px rgba(50,70,40,.04),0 10px 30px rgba(50,70,40,.06)}
+  /* --- quiz shell --- */
+  .quiz-shell{display:grid;grid-template-columns:minmax(0,1fr) 272px;gap:20px;max-width:1280px;margin:0 auto;align-items:start}
+  .q-main{display:flex;flex-direction:column;gap:16px;min-width:0}
+  .q-hero{
+    display:flex;align-items:center;gap:24px;justify-content:space-between;
+    background:#FBFCF4;border:1px solid #E3E9D3;border-radius:18px;padding:30px 34px;
+  }
+  .qh-text{max-width:60%}
+  .q-hero .ch-title{color:var(--inkP);margin-bottom:10px}
+  .q-hero .ch-lead{color:var(--inkP-soft);margin-bottom:0;font-size:14.5px}
+  .q-hero .eyebrow{color:#4C8A3F;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;letter-spacing:.18em;margin-bottom:10px}
+  .q-art{position:relative;width:250px;height:170px;flex-shrink:0}
+  .q-art .orbit{position:absolute;left:50%;top:50%;border:1px solid #CBD9AC;border-radius:50%;transform:translate(-50%,-50%) rotate(-18deg)}
+  .q-art .o1{width:240px;height:96px}
+  .q-art .o2{width:200px;height:140px;transform:translate(-50%,-50%) rotate(22deg);border-color:#DAE5C0}
+  .qa-cube{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-8deg);
+    width:120px;height:120px;border-radius:26px;
+    background:linear-gradient(135deg,#E7F2CC 0%,#C9DD9E 55%,#A4BF74 100%);
+    box-shadow:0 18px 40px rgba(90,120,60,.30),inset 0 2px 6px rgba(255,255,255,.65);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .qa-cube img{width:70%;height:auto;filter:brightness(.35) saturate(1.4)}
+  .qa-dot{position:absolute;border-radius:50%;background:radial-gradient(circle at 32% 28%,#E7F2CC,#A4BF74)}
+  .qa-dot.d1{width:16px;height:16px;left:8px;top:38px}
+  .qa-dot.d2{width:11px;height:11px;right:14px;top:22px}
+  .qa-dot.d3{width:9px;height:9px;right:34px;bottom:16px}
+  /* quiz cards on light */
+  .quiz-shell .q-card{background:#FFFFFF;border:1px solid #E3E9D3;border-radius:16px;padding:24px 26px}
+  .q-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:14px}
+  .quiz-shell .q-num{
+    display:inline-flex;padding:5px 11px;border-radius:99px;background:transparent;color:#4C8A3F;
+    font:700 10.5px/1 ui-monospace,'SF Mono',Menlo,monospace;letter-spacing:.12em;margin:0;
+  }
+  .q-skip{
+    padding:8px 14px;border-radius:9px;background:#F3F6EA;border:1px solid #E3E9D3;cursor:pointer;
+    font-size:12px;font-weight:600;color:#5C6E52;transition:border-color var(--t),background var(--t);white-space:nowrap;
+  }
+  .q-skip:hover{border-color:#AFC38F;background:#EDF2DD}
+  .quiz-shell .q-text{font-size:16px;font-weight:700;color:var(--inkP);margin-bottom:16px}
+  .quiz-shell .opt{
+    background:#FDFEF9;border:1px solid #E0E7CE;border-radius:12px;padding:14px 16px;color:#22361F;position:relative;
+  }
+  .quiz-shell .opt span{color:#22361F}
+  .quiz-shell .opt .radio{border-color:#B4C49A;width:18px;height:18px}
+  .quiz-shell .opt:hover:not(.done){border-color:#8FBF6A;background:#F6FAEA}
+  .quiz-shell .opt.done{cursor:default}
+  .quiz-shell .opt.correct{border:1.5px solid #7FA457;background:#EDF5D6}
+  .quiz-shell .opt.correct .radio{border-color:#4C8A3F}
+  .quiz-shell .opt.correct .radio::after{content:'';position:absolute;inset:3px;border-radius:50%;background:#4C8A3F}
+  .quiz-shell .opt.wrong{border:1.5px solid #D08A80;background:#FAEEEA}
+  .quiz-shell .opt::after{content:none!important}
+  .opt-badge{
+    margin-left:auto;flex-shrink:0;padding:5px 11px;border-radius:8px;background:#fff;
+    font-size:12px;font-weight:700;
+  }
+  .opt-badge.ok{border:1px solid #7FA457;color:#3E7A2E}
+  .opt-badge.bad{border:1px solid #D08A80;color:#A33B31}
+  .quiz-shell .explain{
+    display:none;margin-top:14px;padding:13px 16px;border-radius:10px;background:#F4F8EA;
+    border:1px solid #E3E9D3;border-left:3px solid var(--blue);color:#41543F;font-size:13.5px;line-height:1.6;
+  }
+  .quiz-shell .explain.show{display:block}
+  .quiz-shell .explain.ok{border-left-color:#4C8A3F}
+  .quiz-shell .explain.bad{border-left-color:#C4544A}
+  .ex-spark{color:#4C8A3F;margin-right:4px}
+  .qz-nav{background:#FBFCF4;border:1px solid #E3E9D3;border-radius:16px;padding:16px 20px;margin-top:4px}
+  .quiz-shell .slide-nav{border-top:0}
+  .quiz-shell .dot-step{background:#C6D4A8}
+  .quiz-shell .dot-step.done{background:#8FBF6A}
+  .quiz-shell .dot-step.cur{background:#3E7A2E}
+  .quiz-shell .btn-ghost{border-color:#C9D4B2;color:#41543F}
+  .quiz-shell .btn-ghost:hover{background:#EFF4E0;color:var(--inkP)}
+  #submitQuiz:disabled{opacity:.45;cursor:default;transform:none!important}
+  /* right rail */
+  .q-rail{display:flex;flex-direction:column;gap:14px;position:sticky;top:82px}
+  .rail-card{background:#FFFFFF;border:1px solid #E3E9D3;border-radius:16px;padding:18px 20px}
+  .rail-label{
+    font:700 10px/1 ui-monospace,'SF Mono',Menlo,monospace;letter-spacing:.18em;text-transform:uppercase;
+    color:#4C8A3F;margin-bottom:14px;
+  }
+  .rail-ring{display:flex;align-items:center;gap:14px}
+  .rail-ring svg{width:58px;height:58px;flex-shrink:0}
+  #railArc{transition:stroke-dashoffset .5s var(--ease-in-out)}
+  .rail-ring-txt b{display:block;font-size:16px;color:var(--inkP)}
+  .rail-ring-txt small{font-size:11.5px;color:#7C8B72}
+  .stat-row{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:13px;color:#41543F;border-bottom:1px solid #EFF3E3}
+  .stat-row:last-child{border-bottom:0}
+  .stat-row b{margin-left:auto;color:var(--inkP);font-size:13.5px}
+  .st-ic{width:22px;height:22px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
+  .st-ic.ok{background:#E4F0C8;color:#3E7A2E}
+  .st-ic.bad{background:#F6E3DE;color:#A33B31}
+  .st-ic.skip{background:#EDF0E4;color:#6C7A63}
+  @media (max-width:1080px){
+    .quiz-shell{grid-template-columns:1fr}
+    .q-rail{position:static;flex-direction:row}
+    .q-rail .rail-card{flex:1}
+    .q-art{display:none}
+    .qh-text{max-width:none}
+  }
+  @media (max-width:860px){ .sidebar{display:none!important} }
+
   /* ===== §14 reduced motion & accessibility (apple-design) ===== */
   @media (prefers-reduced-motion: reduce){
     .cube,.dec-cube,.halo,.orbit,.od,.spark,.eq span,.intro-orb,.intro-video,
@@ -1403,20 +1571,30 @@
 <section class="screen" id="onboarding">
   <div class="app">
     <aside class="sidebar">
-      <div class="wordmark side-logo">NVEX<span class="tech-chip">tech</span></div>
+      <img class="logo-img side-logo-img" src="assets/nvex-logo.png" alt="NVEX tech">
+      <div class="sp-card">
+        <div class="sp-ring">
+          <svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="none" stroke="#233324" stroke-width="6"/><circle id="ringArc" cx="32" cy="32" r="26" fill="none" stroke="#C2DC92" stroke-width="6" stroke-linecap="round" stroke-dasharray="163.4" stroke-dashoffset="163.4" transform="rotate(-90 32 32)"/></svg>
+          <b id="ringPct">0%</b>
+        </div>
+        <div class="sp-info">
+          <b id="spTitle">Розділ 1</b>
+          <small id="spMode">Урок</small>
+          <div class="bar"><i id="sideBar"></i></div>
+        </div>
+      </div>
       <div class="side-label">Розділи</div>
       <div id="chapterList"></div>
-      <div class="side-progress">
-        <div class="sp-row"><span>Прогрес</span><span id="sideePct">0%</span></div>
-        <div class="bar"><i id="sideBar"></i></div>
-      </div>
+      <div class="tip-card"><b>💡 Порада</b><p id="tipText">Проходь у своєму темпі — прогрес зберігається автоматично.</p></div>
     </aside>
     <div class="main">
       <div class="topbar">
-        <img class="logo-img top-logo-img" src="assets/nvex-logo.png" alt="NVEX tech">
-        <span class="step-count" id="topLabel"></span>
-        <div class="bar"><i id="topBar"></i></div>
-        <span class="step-count" id="topPct">0%</span>
+        <button class="top-chip" id="topBack" hidden>&lsaquo;&nbsp; <span id="topLabel">Розділ</span></button>
+        <span class="top-crumb" id="topCrumb"></span>
+        <span style="flex:1"></span>
+        <span class="step-count" id="topPct" hidden>0%</span>
+        <div class="bar" hidden><i id="topBar"></i></div>
+        <button class="top-chip exit" id="topExit">Вийти</button>
         <i id="readBar"></i>
       </div>
       <div class="content" id="content"></div>
@@ -2362,23 +2540,40 @@ function rollTo(el,text){
   clearTimeout(el._h);
   el._h=setTimeout(()=>{ el._a.textContent=text; w.classList.remove('rolling'); },320);
 }
+const QUIZ_TIPS=['Уважно читай питання та обирай найточнішу відповідь.','Все, що є в тесті, було в розділі — якщо сумніваєшся, повернись і перечитай.'];
+const LESSON_TIPS=['Проходь у своєму темпі — прогрес зберігається автоматично.','Інтерактивні екрани клікабельні — спробуй пройти кроки сам.'];
 function updateProgress(){
   const pct=Math.round(stepsDone()/TOTAL_STEPS*100);
   $('#topBar').style.width=pct+'%';
   $('#sideBar').style.width=pct+'%';
   rollTo($('#topPct'),pct+'%');
-  $('#sideePct').textContent=pct+'%';
-  $('#topLabel').textContent=`Розділ ${state.chapter+1} з ${CHAPTERS.length}${state.mode==='quiz'||state.mode==='result'?' · Перевірка знань':''}`;
+  $('#ringPct').textContent=pct+'%';
+  $('#ringArc').style.strokeDashoffset=(163.4*(1-pct/100)).toFixed(1);
+  $('#spTitle').textContent=`Розділ ${state.chapter+1} з ${CHAPTERS.length}`;
+  $('#spMode').textContent=state.mode==='quiz'?'Перевірка знань':state.mode==='result'?'Результат':state.mode==='tool'?'Плагін':'Урок';
+  const inQuiz=state.mode==='quiz'||state.mode==='result'||state.mode==='tool';
+  const back=$('#topBack');
+  back.hidden=!inQuiz;
+  $('#topLabel').textContent=`Розділ ${state.chapter+1} з ${CHAPTERS.length}`;
+  $('#topCrumb').textContent=inQuiz?'':`Розділ ${state.chapter+1} з ${CHAPTERS.length}`;
+  $('#topExit').textContent=state.mode==='quiz'?'Вийти з тесту':'Вийти';
+  const tip=$('#tipText');
+  if(tip) tip.textContent=(state.mode==='quiz'?QUIZ_TIPS:LESSON_TIPS)[state.chapter%2];
 }
+$('#topBack').addEventListener('click',()=>{ state.mode='lesson'; render(); });
+$('#topExit').addEventListener('click',()=>{ if(state.mode==='quiz'){ state.mode='lesson'; render(); } else logout(); });
 
 /* =================== SIDEBAR =================== */
+const LOCK_SVG='<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+const CHECK_SVG='<svg viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
 function renderSidebar(){
   chapterList.innerHTML=CHAPTERS.map((c,i)=>{
     const done=state.doneChapters.has(i);
     const locked=i>state.unlocked;
     const cur=i===state.chapter;
+    const stateIc = locked?LOCK_SVG : done?CHECK_SVG : cur?'<i class="cur-dot"></i>':'';
     return `<button class="chapter-item ${cur?'current':''} ${done?'done':''} ${locked?'locked':''}" data-i="${i}" ${locked?'disabled':''}>
-      <span class="ch-badge">${done?ICONS.check:i+1}</span><span>${c.title}</span>
+      <span class="ch-num">0${i+1}</span><span class="ch-t">${c.title}</span><span class="ch-state">${stateIc}</span>
     </button>`;
   }).join('');
   chapterList.querySelectorAll('.chapter-item:not(.locked)').forEach(b=>{
@@ -2558,17 +2753,19 @@ function quizHTML(){
   const c=CHAPTERS[state.chapter];
   state.answers=new Array(c.quiz.length).fill(null);
   return `<div class="stage content-inner">
-    <div class="slide-card">
-    <div class="ls-toolbar">
-      <div class="ls-crumb"><span class="ch-icon sm">${ICONS[c.icon]}</span><span class="eyebrow">0${state.chapter+1} · ПЕРЕВІРКА ЗНАНЬ</span></div>
-      <div class="ls-meta">
-        <span class="meta-chip">${c.quiz.length} питань</span>
-        ${c.practice?'<span class="meta-chip">+ практичне завдання</span>':''}
+    <div class="quiz-shell">
+    <div class="q-main">
+    <div class="q-hero">
+      <div class="qh-text">
+        <div class="eyebrow">0${state.chapter+1} · ПЕРЕВІРКА ЗНАНЬ</div>
+        <h1 class="ch-title">${c.title}</h1>
+        <p class="ch-lead">${c.practice?'Виконай практичне завдання і дай відповіді на питання, щоб відкрити наступний розділ.':'Дай відповіді на питання нижче, щоб відкрити наступний розділ.'}</p>
       </div>
-    </div>
-    <div class="quiz-head">
-      <h1 class="ch-title">${c.title}</h1>
-      <p class="ch-lead">${c.practice?'Виконай практичне завдання і дай відповіді на питання, щоб відкрити наступний розділ.':'Дай відповіді на питання нижче, щоб відкрити наступний розділ.'}</p>
+      <div class="q-art" aria-hidden="true">
+        <span class="orbit o1"></span><span class="orbit o2"></span>
+        <span class="qa-cube"><img src="assets/nvex-logo.png" alt=""></span>
+        <span class="qa-dot d1"></span><span class="qa-dot d2"></span><span class="qa-dot d3"></span>
+      </div>
     </div>
     ${c.practice?`<div class="q-card">
       <div class="q-num">ПРАКТИЧНЕ ЗАВДАННЯ</div>
@@ -2576,19 +2773,35 @@ function quizHTML(){
       ${practiceHTML(c.practice)}
     </div>`:''}
     ${c.quiz.map((q,qi)=>`
-      <div class="q-card" data-q="${qi}">
-        <div class="q-num">ПИТАННЯ ${qi+1} / ${c.quiz.length}</div>
+      <div class="q-card" data-q="${qi}" data-a="${q.a}">
+        <div class="q-head"><div class="q-num">ПИТАННЯ ${qi+1} З ${c.quiz.length}</div>
+        ${isAdmin()?'':`<button class="q-skip" data-skip="${qi}">Пропустити питання&nbsp;&#8677;</button>`}</div>
         <div class="q-text">${q.q}</div>
         ${q.opts.map((o,oi)=>`<button class="opt" data-o="${oi}"><span class="radio"></span><span>${o}</span></button>`).join('')}
         <div class="explain"></div>
       </div>`).join('')}
-    <div class="slide-nav">
+    <div class="slide-nav qz-nav">
       <button class="btn btn-ghost" id="backLessonBtn">&larr;&nbsp; Назад</button>
-      <span class="ans-count" id="ansCount">Відповідей: 0 із ${c.quiz.length}</span>
       ${dotsHTML()}
-      <button class="btn" id="submitQuiz">Надіслати&nbsp; &rarr;</button>
+      <button class="btn" id="submitQuiz" disabled>Завершити тест&nbsp; &rarr;</button>
       ${isAdmin()?`<button class="btn" id="admNextCh">${state.chapter===CHAPTERS.length-1?'На початок':'Наступний розділ'}&nbsp; &rarr;</button>`:''}
     </div>
+    </div>
+    <aside class="q-rail">
+      <div class="rail-card">
+        <div class="rail-label">Ваш прогрес</div>
+        <div class="rail-ring">
+          <svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="none" stroke="#E4EBD3" stroke-width="6"/><circle id="railArc" cx="32" cy="32" r="26" fill="none" stroke="#7FA457" stroke-width="6" stroke-linecap="round" stroke-dasharray="163.4" stroke-dashoffset="163.4" transform="rotate(-90 32 32)"/></svg>
+          <div class="rail-ring-txt"><b id="railN">0 / ${c.quiz.length}</b><small>питань відповіли</small></div>
+        </div>
+      </div>
+      <div class="rail-card">
+        <div class="rail-label">Статистика</div>
+        <div class="stat-row"><span class="st-ic ok">✓</span>Правильних<b id="stOk">0</b></div>
+        <div class="stat-row"><span class="st-ic bad">✕</span>Неправильних<b id="stBad">0</b></div>
+        <div class="stat-row"><span class="st-ic skip">➟</span>Пропущено<b id="stSkip">0</b></div>
+      </div>
+    </aside>
     </div>
   </div>`;
 }
@@ -2731,24 +2944,68 @@ function bind(){
   const backL=$('#backLessonBtn'); if(backL) backL.addEventListener('click',()=>{ state.mode='lesson'; render(); });
   const retry=$('#retryBtn'); if(retry) retry.addEventListener('click',()=>{ state.mode='quiz'; render(); });
 
+  function updateQuizStats(){
+    const total=state.answers.length;
+    const c=CHAPTERS[state.chapter];
+    let ok=0,bad=0,skip=0;
+    state.answers.forEach((a,i)=>{
+      if(a==='skip') skip++;
+      else if(a!==null) (a===c.quiz[i].a?ok++:bad++);
+    });
+    const done=ok+bad+skip;
+    const rn=$('#railN'); if(rn) rn.textContent=`${done} / ${total}`;
+    const ra=$('#railArc'); if(ra) ra.style.strokeDashoffset=(163.4*(1-done/Math.max(1,total))).toFixed(1);
+    const so=$('#stOk'), sb=$('#stBad'), ss=$('#stSkip');
+    if(so){ so.textContent=ok; sb.textContent=bad; ss.textContent=skip; }
+    const sub=$('#submitQuiz');
+    if(sub) sub.disabled = done<total;
+  }
+  function revealCard(card, chosen){
+    const c=CHAPTERS[state.chapter];
+    const qi=+card.dataset.q, q=c.quiz[qi];
+    card.dataset.locked='1';
+    const skipBtn=card.querySelector('.q-skip'); if(skipBtn) skipBtn.remove();
+    card.querySelectorAll('.opt').forEach((o,oi)=>{
+      o.classList.add('done');
+      if(oi===q.a){
+        o.classList.add('correct');
+        o.insertAdjacentHTML('beforeend','<span class="opt-badge ok">✓ Правильно</span>');
+      } else if(chosen!=='skip'&&oi===chosen){
+        o.classList.add('wrong');
+        o.insertAdjacentHTML('beforeend','<span class="opt-badge bad">✕ Неправильно</span>');
+      }
+    });
+    const ex=card.querySelector('.explain');
+    const ok=chosen===q.a;
+    ex.innerHTML=`<span class="ex-spark">✦</span> ${q.why}`;
+    ex.classList.add('show');
+    if(chosen!=='skip') ex.classList.add(ok?'ok':'bad');
+    updateQuizStats();
+  }
   document.querySelectorAll('.q-card').forEach(card=>{
     card.querySelectorAll('.opt').forEach(opt=>{
       opt.addEventListener('click',()=>{
-        if(state.mode!=='quiz'||isAdmin()) return;
-        card.querySelectorAll('.opt').forEach(o=>o.classList.remove('selected'));
+        if(state.mode!=='quiz'||isAdmin()||card.dataset.locked) return;
+        const chosen=+opt.dataset.o;
         opt.classList.add('selected');
-        state.answers[+card.dataset.q]=+opt.dataset.o;
-        const ac=$('#ansCount');
-        if(ac) ac.textContent=`Відповідей: ${state.answers.filter(x=>x!==null).length} із ${state.answers.length}`;
+        state.answers[+card.dataset.q]=chosen;
+        revealCard(card, chosen);
       });
     });
+    const sk=card.querySelector('.q-skip');
+    if(sk) sk.addEventListener('click',()=>{
+      if(state.mode!=='quiz'||card.dataset.locked) return;
+      state.answers[+card.dataset.q]='skip';
+      revealCard(card,'skip');
+    });
   });
+  updateQuizStats();
 
   const submit=$('#submitQuiz');
   if(submit) submit.addEventListener('click',()=>{
     const prac=content.querySelector('.practice-block');
     if(prac && prac.dataset.done!=='1'){ toast('Спершу виконай практичне завдання'); prac.scrollIntoView({behavior:'smooth',block:'center'}); return; }
-    if(state.answers.some(a=>a===null)){ toast('Дай відповіді на всі питання перед надсиланням'); return; }
+    if(state.answers.some(a=>a===null)){ toast('Дай відповіді на всі питання'); return; }
     const c=CHAPTERS[state.chapter];
     const correct=state.answers.filter((a,i)=>a===c.quiz[i].a).length;
     const passed=correct===c.quiz.length;
