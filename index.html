@@ -206,8 +206,10 @@
   .hero-title{font-size:clamp(38px,4.6vw,56px);font-weight:800;line-height:1.03;letter-spacing:-.025em;color:var(--ink);text-transform:uppercase}
   .grad-text{color:var(--blue);font-style:italic}
   .hero-dot{color:var(--blue)}
-  .logo-lock{color:var(--blue);display:inline-flex;align-items:center;font-style:normal}
-  .logo-lock .tech-chip{font-size:.34em;vertical-align:baseline;transform:translateY(.08em)}
+  .logo-img{display:inline-block;width:auto}
+  .hero-logo{height:.94em;margin-top:.14em}
+  .intro-logo-img{height:.9em;margin-top:.12em}
+  .top-logo-img{height:20px;margin-right:10px;flex-shrink:0}
   .hero-sub{margin-top:14px;font-size:16px;color:var(--ink-soft)}
   .hero-feats{margin-top:34px;display:flex;flex-direction:column;gap:22px}
   .hero-feat{display:flex;align-items:center;gap:16px}
@@ -1215,7 +1217,7 @@
   <div class="tech-grid"></div>
   <div class="login-wrap">
     <div class="login-hero">
-      <h1 class="hero-title">Вітаємо у<br><span class="logo-lock">NVEX<span class="tech-chip">tech</span></span></h1>
+      <h1 class="hero-title">Вітаємо у<br><img class="logo-img hero-logo" src="assets/nvex-logo.png" alt="NVEX tech"></h1>
       <p class="hero-sub">Увійди, щоб розпочати онбординг</p>
       <div class="hero-feats">
         <div class="hero-feat"><span class="hf-ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><div><b>Все, що потрібно знати на старті</b><small>Компанія, комунікація та процеси</small></div></div>
@@ -1314,7 +1316,7 @@
         <canvas id="orbCanvas" aria-hidden="true"></canvas>
       </div>
     </div>
-    <h1 class="intro-title">Вітаємо у<br><span class="logo-lock">NVEX<span class="tech-chip">tech</span></span></h1>
+    <h1 class="intro-title">Вітаємо у<br><img class="logo-img intro-logo-img" src="assets/nvex-logo.png" alt="NVEX tech"></h1>
     <div class="eq"><span></span><span></span><span></span><span></span><span></span></div>
     <div class="subs" id="subs" aria-live="polite"></div>
     <p class="sound-hint"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14v-3a9 9 0 0 1 18 0v3"/><path d="M21 17a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h3zM3 17a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2H3z"/></svg><b>Увімкніть звук</b><span class="sep">·</span>щоб нічого не пропустити</p>
@@ -1339,7 +1341,7 @@
     </aside>
     <div class="main">
       <div class="topbar">
-        <span class="wordmark top-logo">NVEX<span class="tech-chip">tech</span></span>
+        <img class="logo-img top-logo-img" src="assets/nvex-logo.png" alt="NVEX tech">
         <span class="step-count" id="topLabel"></span>
         <div class="bar"><i id="topBar"></i></div>
         <span class="step-count" id="topPct">0%</span>
