@@ -329,6 +329,64 @@
   .ap-reset{padding:6px 11px;border-radius:8px;background:var(--bg-soft);color:var(--ink-soft);font-size:12px;cursor:pointer;white-space:nowrap}
   .ap-reset:hover{background:#2a302c;color:var(--ink)}
   .ap-empty{padding:26px;text-align:center;color:var(--ink-faint);font-size:14px}
+  /* ===== AE tools marketplace list ===== */
+  .ae-tools{display:flex;flex-direction:column;gap:10px;margin:6px 0 26px}
+  .tl-row{
+    display:flex;align-items:center;gap:16px;padding:14px 18px;cursor:pointer;
+    background:var(--bg-deep);border:1px solid var(--line);border-radius:14px;
+    transition:border-color var(--t),transform var(--t),box-shadow var(--t);
+  }
+  .tl-row:hover{border-color:rgba(187,221,136,.35);transform:translateY(-1px);box-shadow:var(--shadow-sm)}
+  .tl-row:active{transform:scale(.995)}
+  .tl-ic{
+    width:44px;height:44px;border-radius:12px;flex-shrink:0;
+    background:#16301F;color:var(--blue);
+    display:inline-flex;align-items:center;justify-content:center;
+    font-size:14px;font-weight:800;letter-spacing:.02em;
+  }
+  .tl-name{flex:1;min-width:0}
+  .tl-name b{display:block;font-size:15px;font-weight:700;color:var(--ink)}
+  .tl-name small{color:var(--ink-faint);font-size:12.5px}
+  .tl-cat{
+    padding:7px 13px;border:1px solid var(--line);border-radius:9px;
+    font-size:12.5px;color:var(--ink-soft);white-space:nowrap;
+  }
+  .tl-ae{
+    padding:7px 11px;border-radius:9px;background:rgba(187,221,136,.13);
+    color:var(--blue);font-size:12.5px;font-weight:800;
+  }
+  .tl-dl{
+    width:40px;height:40px;border-radius:11px;background:var(--bg-soft);flex-shrink:0;cursor:pointer;
+    display:inline-flex;align-items:center;justify-content:center;transition:background var(--t),color var(--t);color:var(--ink-soft);
+  }
+  .tl-dl:hover{background:var(--blue);color:#10150C}
+  .tl-dl svg{width:17px;height:17px;stroke:currentColor}
+  @media (max-width:760px){ .tl-cat{display:none} }
+  /* ===== tool detail modal ===== */
+  #toolModal{
+    display:none;position:fixed;inset:0;z-index:85;padding:40px 20px;overflow-y:auto;
+    background:rgba(10,13,11,.74);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  }
+  #toolModal.open{display:flex;align-items:flex-start;justify-content:center}
+  .tm-card{
+    width:min(720px,100%);background:var(--card,#1B1F1E);border:1px solid var(--line);
+    border-radius:20px;box-shadow:0 24px 60px rgba(0,0,0,.5);padding:24px 26px 26px;
+  }
+  .tm-head{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+  .tm-title{flex:1;min-width:0}
+  .tm-title h3{font-size:19px;font-weight:800;color:var(--ink)}
+  .tm-title small{color:var(--ink-faint);font-size:12.5px}
+  .tm-video{
+    border-radius:14px;overflow:hidden;background:var(--bg-deep);border:1px solid var(--line);
+    aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;margin-bottom:16px;
+  }
+  .tm-video iframe,.tm-video video{width:100%;height:100%;border:0;display:block;object-fit:cover}
+  .tm-video .ph{color:var(--ink-faint);font-size:13.5px;display:flex;flex-direction:column;align-items:center;gap:10px}
+  .tm-video .ph svg{width:34px;height:34px;stroke:var(--ink-faint)}
+  .tm-desc{font-size:14.5px;line-height:1.7;color:var(--ink-soft);margin-bottom:20px}
+  .tm-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .tm-actions .btn{padding:13px 24px;font-size:13.5px}
+  .tm-note{font-size:12.5px;color:var(--ink-faint)}
   .adm-edit{outline:1.5px dashed rgba(187,221,136,.5);outline-offset:4px;border-radius:6px;cursor:text;min-height:1em}
   .adm-edit:focus{outline:2px solid var(--blue);outline-offset:4px}
   .adm-bar{
@@ -1318,6 +1376,26 @@ document.addEventListener('DOMContentLoaded',()=>{
     </div>
   </div>
 </div>
+<!-- ============ AE TOOL DETAIL ============ -->
+<div id="toolModal">
+  <div class="tm-card">
+    <div class="tm-head">
+      <span class="tl-ic" id="tmIc"></span>
+      <div class="tm-title"><h3 id="tmName"></h3><small id="tmBy"></small></div>
+      <span class="tl-cat" id="tmCat"></span>
+      <span class="tl-ae">Ae</span>
+      <button class="ap-close" id="tmClose" aria-label="Закрити">✕</button>
+    </div>
+    <div class="tm-video" id="tmVideo"></div>
+    <p class="tm-desc" id="tmDesc"></p>
+    <div class="tm-actions">
+      <a class="btn" id="tmDl" target="_blank" rel="noopener">Завантажити
+        <svg class="arr" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 5-5m-5 5-5-5M4 21h16"/></svg>
+      </a>
+      <span class="tm-note" id="tmNote"></span>
+    </div>
+  </div>
+</div>
 <audio id="narration" src="onboarding.mp3?v=2" preload="auto"></audio>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -1773,18 +1851,9 @@ const CHAPTERS = [
   lead:"Перед першим завданням постав робочий набір плагінів і скриптів. Це те, на чому будується весь наш моушн-пайплайн — від анімації до здачі роботи.",
   body:`<p>Усе ставиться <strong>один раз</strong> і працює далі щодня. Ліцензії на платні розширення — корпоративні: не купуй нічого сам, напиши в <strong>#help-it</strong>, і тобі видадуть доступ.</p>
   <p><strong>Порядок встановлення:</strong> спочатку закрий After Effects → постав розширення → відкрий AE → знайди панелі в меню <strong>Window → Extensions</strong>.</p>
-  <div class="tiles">
-    <div class="tile"><h4>${ICONS.dot} Motion Bro</h4><p>Менеджер пресетів: переходи, титри, ефекти. Ставиться через ZXP-інсталятор, ліцензія — корпоративна.</p></div>
-    <div class="tile"><h4>${ICONS.dot} Animation Composer</h4><p>Безкоштовна панель від Mister Horse: базові пресети руху, зручні криві, швидкі текстові анімації.</p></div>
-    <div class="tile"><h4>${ICONS.dot} Наші кастомні панелі</h4><p>Внутрішні інструменти NVEX — забирай останні версії в <strong>#help-it</strong>, вони оновлюються частіше за публічні.</p></div>
-  </div>
-  <p><strong>Кастомні панелі NVEX</strong>, які ставимо після базових:</p>
-  <div class="tiles">
-    <div class="tile"><h4>${ICONS.dot} Motion Library</h4><p>Спільна бібліотека готових сцен і футажу: перетягуєш елемент у композицію прямо з панелі.</p></div>
-    <div class="tile"><h4>${ICONS.dot} Publish</h4><p>Здача роботи в один клік: панель заливає рендери у потрібну папку на Shared Drive і сама записує лінк у таск.</p></div>
-    <div class="tile"><h4>${ICONS.dot} Voice</h4><p>Генерація й заміна озвучки прямо в AE — без ручного експорту та імпорту звуку.</p></div>
-  </div>
-  <div class="callout">${ICONS.info}<div>Якщо панель не з'явилась у Window → Extensions — майже завжди це блокування непідписаних розширень. Не колупай systemPreferences самотужки: напиши в #help-it, тобі дадуть готову інструкцію під твою версію macOS.</div></div>`,
+  <p><strong>Робочий набір:</strong> клікни на інструмент, щоб побачити опис, демо і посилання на завантаження.</p>
+  <div class="ae-tools" id="aeToolsList"></div>
+  <div class="callout">${ICONS.info}<div>Якщо панель не з'явилась у Window → Extensions — майже завжди це блокування непідписаних розширень. Не колупай системні налаштування самотужки: напиши в #help-it, тобі дадуть готову інструкцію під твою версію macOS.</div></div>`,
   media:[
     {type:'video', src:'', ph:'Відео: встановлення плагінів крок за кроком', caption:'Повне встановлення робочого набору AE — від ZXP до першого запуску панелей.'},
     {type:'image', src:'', ph:'Скрін: меню Window → Extensions з нашими панелями', caption:'Так виглядає AE з усіма встановленими панелями NVEX.'}
@@ -2483,6 +2552,67 @@ const _revealIO=new IntersectionObserver(es=>es.forEach(e=>{
   if(e.isIntersecting){ e.target.classList.add('plx-show'); _revealIO.unobserve(e.target); }
 }),{root:$('#content'),threshold:.12});
 
+/* =================== AE TOOLS (marketplace-style) =================== */
+const AE_TOOLS=[
+  {id:'motionbro', ic:'MB', name:'Motion Bro', by:'motionbro', cat:'Пресети',
+   desc:'Менеджер пресетів для AE: переходи, титри, ефекти, звук. Ставиться через ZXP-інсталятор. Ліцензія корпоративна — доступ видається через #help-it, самому купувати нічого не треба.',
+   link:'https://motionbro.com/', note:'Ліцензія: корпоративна · через #help-it', video:''},
+  {id:'animcomposer', ic:'AC', name:'Animation Composer', by:'Mister Horse', cat:'Анімація',
+   desc:'Безкоштовна панель від Mister Horse: базові пресети руху, зручні криві, швидкі текстові анімації. Обовʼязкова база для щоденної роботи.',
+   link:'https://misterhorse.com/animation-composer', note:'Безкоштовно', video:''},
+  {id:'motionlibrary', ic:'ML', name:'Motion Library', by:'NVEX', cat:'Бібліотека',
+   desc:'Наша спільна бібліотека готових сцен і футажу: шукаєш елемент у панелі та перетягуєш його прямо в композицію. Оновлюється командою щотижня.',
+   link:'#', note:'Внутрішня панель · остання версія в #help-it', video:''},
+  {id:'publish', ic:'PB', name:'Publish', by:'NVEX', cat:'Пайплайн',
+   desc:'Здача роботи в один клік: панель сама заливає рендери у правильну папку продукту на Shared Drive і записує посилання в таск. Ніяких ручних заливок.',
+   link:'#', note:'Внутрішня панель · остання версія в #help-it', video:''},
+  {id:'voice', ic:'VC', name:'Voice', by:'NVEX', cat:'Озвучка',
+   desc:'Генерація й заміна озвучки прямо в After Effects: обираєш голос, вставляєш текст — аудіо зʼявляється в композиції без ручного експорту та імпорту.',
+   link:'#', note:'Внутрішня панель · остання версія в #help-it', video:''},
+];
+function initAeTools(){
+  const list=content.querySelector('#aeToolsList');
+  if(!list) return;
+  list.innerHTML=AE_TOOLS.map(t=>`
+    <div class="tl-row" data-tool="${t.id}">
+      <span class="tl-ic">${t.ic}</span>
+      <div class="tl-name"><b>${t.name}</b><small>by ${t.by}</small></div>
+      <span class="tl-cat">${t.cat}</span>
+      <span class="tl-ae">Ae</span>
+      <button class="tl-dl" data-dl="${t.id}" title="Завантажити" aria-label="Завантажити ${t.name}">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 5-5m-5 5-5-5M4 21h16"/></svg>
+      </button>
+    </div>`).join('');
+  list.querySelectorAll('.tl-row').forEach(r=>r.addEventListener('click',e=>{
+    const t=AE_TOOLS.find(x=>x.id===r.dataset.tool);
+    if(e.target.closest('.tl-dl')){ toolDownload(t); return; }
+    openTool(t);
+  }));
+}
+function toolDownload(t){
+  if(t.link&&t.link!=='#') window.open(t.link,'_blank','noopener');
+  else toast('Посилання видасть #help-it — внутрішня збірка');
+}
+const toolModal=$('#toolModal');
+function openTool(t){
+  $('#tmIc').textContent=t.ic;
+  $('#tmName').textContent=t.name;
+  $('#tmBy').textContent='by '+t.by;
+  $('#tmCat').textContent=t.cat;
+  $('#tmDesc').textContent=t.desc;
+  $('#tmNote').textContent=t.note||'';
+  const dl=$('#tmDl');
+  if(t.link&&t.link!=='#'){ dl.href=t.link; dl.onclick=null; }
+  else { dl.href='javascript:void(0)'; dl.onclick=()=>toolDownload(t); }
+  const v=$('#tmVideo'), yid=(typeof ytId==='function')?ytId(t.video):null;
+  if(yid) v.innerHTML=`<iframe src="https://www.youtube.com/embed/${yid}" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>`;
+  else if(t.video) v.innerHTML=`<video src="${t.video}" controls playsinline></video>`;
+  else v.innerHTML=`<div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>Демо-відео скоро буде</div>`;
+  toolModal.classList.add('open');
+}
+$('#tmClose').addEventListener('click',()=>toolModal.classList.remove('open'));
+toolModal.addEventListener('click',e=>{ if(e.target===toolModal) toolModal.classList.remove('open'); });
+
 function bind(){
   initTours();
   initPractices();
@@ -2554,6 +2684,7 @@ function bind(){
     state.chapter = state.chapter===CHAPTERS.length-1 ? 0 : state.chapter+1;
     state.mode='lesson'; render();
   });
+  initAeTools();
   initDock();
   initTilt();
   enhanceAdmin();
