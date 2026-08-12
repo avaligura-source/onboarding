@@ -362,31 +362,21 @@
   .tl-dl:hover{background:var(--blue);color:#10150C}
   .tl-dl svg{width:17px;height:17px;stroke:currentColor}
   @media (max-width:760px){ .tl-cat{display:none} }
-  /* ===== tool detail modal ===== */
-  #toolModal{
-    display:none;position:fixed;inset:0;z-index:85;padding:40px 20px;overflow-y:auto;
-    background:rgba(10,13,11,.74);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  /* ===== tool page (per-plugin) ===== */
+  .tool-page{max-width:880px;margin:0 auto}
+  .tp-back{margin-bottom:26px}
+  .tp-head{display:flex;align-items:center;gap:16px;margin-bottom:22px}
+  .tp-head .tl-ic{width:54px;height:54px;font-size:16px;border-radius:14px}
+  .tp-head h1{font-size:clamp(22px,2.6vw,30px);font-weight:800;color:var(--ink);text-transform:uppercase;letter-spacing:-.01em}
+  .tp-head small{color:var(--ink-faint);font-size:13px}
+  .tp-video{
+    border-radius:16px;overflow:hidden;background:var(--bg-deep);border:1px solid var(--line);
+    aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;margin-bottom:22px;
   }
-  #toolModal.open{display:flex;align-items:flex-start;justify-content:center}
-  .tm-card{
-    width:min(720px,100%);background:var(--card,#1B1F1E);border:1px solid var(--line);
-    border-radius:20px;box-shadow:0 24px 60px rgba(0,0,0,.5);padding:24px 26px 26px;
-  }
-  .tm-head{display:flex;align-items:center;gap:14px;margin-bottom:18px}
-  .tm-title{flex:1;min-width:0}
-  .tm-title h3{font-size:19px;font-weight:800;color:var(--ink)}
-  .tm-title small{color:var(--ink-faint);font-size:12.5px}
-  .tm-video{
-    border-radius:14px;overflow:hidden;background:var(--bg-deep);border:1px solid var(--line);
-    aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;margin-bottom:16px;
-  }
-  .tm-video iframe,.tm-video video{width:100%;height:100%;border:0;display:block;object-fit:cover}
-  .tm-video .ph{color:var(--ink-faint);font-size:13.5px;display:flex;flex-direction:column;align-items:center;gap:10px}
-  .tm-video .ph svg{width:34px;height:34px;stroke:var(--ink-faint)}
-  .tm-desc{font-size:14.5px;line-height:1.7;color:var(--ink-soft);margin-bottom:20px}
-  .tm-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-  .tm-actions .btn{padding:13px 24px;font-size:13.5px}
-  .tm-note{font-size:12.5px;color:var(--ink-faint)}
+  .tp-video iframe,.tp-video video{width:100%;height:100%;border:0;display:block;object-fit:cover}
+  .tp-video .ph{color:var(--ink-faint);font-size:13.5px;display:flex;flex-direction:column;align-items:center;gap:10px}
+  .tp-video .ph svg{width:34px;height:34px;stroke:var(--ink-faint)}
+  .tp-desc{font-size:15.5px;line-height:1.75;color:var(--ink-soft);margin-bottom:26px;max-width:640px}
   .adm-edit{outline:1.5px dashed rgba(187,221,136,.5);outline-offset:4px;border-radius:6px;cursor:text;min-height:1em}
   .adm-edit:focus{outline:2px solid var(--blue);outline-offset:4px}
   .adm-bar{
@@ -1373,26 +1363,6 @@ document.addEventListener('DOMContentLoaded',()=>{
         <thead><tr><th>Співробітник</th><th>Прогрес</th><th>Розділи</th><th>Активність</th><th></th></tr></thead>
         <tbody id="apRows"></tbody>
       </table>
-    </div>
-  </div>
-</div>
-<!-- ============ AE TOOL DETAIL ============ -->
-<div id="toolModal">
-  <div class="tm-card">
-    <div class="tm-head">
-      <span class="tl-ic" id="tmIc"></span>
-      <div class="tm-title"><h3 id="tmName"></h3><small id="tmBy"></small></div>
-      <span class="tl-cat" id="tmCat"></span>
-      <span class="tl-ae">Ae</span>
-      <button class="ap-close" id="tmClose" aria-label="Закрити">✕</button>
-    </div>
-    <div class="tm-video" id="tmVideo"></div>
-    <p class="tm-desc" id="tmDesc"></p>
-    <div class="tm-actions">
-      <a class="btn" id="tmDl" target="_blank" rel="noopener">Завантажити
-        <svg class="arr" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 5-5m-5 5-5-5M4 21h16"/></svg>
-      </a>
-      <span class="tm-note" id="tmNote"></span>
     </div>
   </div>
 </div>
@@ -2408,7 +2378,7 @@ function saveView(){
   _viewT=setTimeout(()=>{
     try{ localStorage.setItem(VIEW_KEY, JSON.stringify({
       uid:NVEX.user.id, chapter:state.chapter,
-      mode:state.mode==='result'?'lesson':state.mode,   // result needs live answers → fall back to lesson
+      mode:(state.mode==='result'||state.mode==='tool')?'lesson':state.mode,
       scroll:content.scrollTop|0
     })); }catch(_){}
   },250);
@@ -2436,6 +2406,7 @@ function render(){ renderSidebar(); updateProgress();
     transition(dec+lessonHTML(), chapterChanged?{num:state.chapter+1,icon:c.icon,title:c.title}:null);
   }
   else if(state.mode==='quiz'){ transition(dec+quizHTML()); }
+  else if(state.mode==='tool'){ transition(toolHTML()); }
   else transition(dec+resultHTML());
   saveView();
 }
@@ -2593,25 +2564,28 @@ function toolDownload(t){
   if(t.link&&t.link!=='#') window.open(t.link,'_blank','noopener');
   else toast('Посилання видасть #help-it — внутрішня збірка');
 }
-const toolModal=$('#toolModal');
-function openTool(t){
-  $('#tmIc').textContent=t.ic;
-  $('#tmName').textContent=t.name;
-  $('#tmBy').textContent='by '+t.by;
-  $('#tmCat').textContent=t.cat;
-  $('#tmDesc').textContent=t.desc;
-  $('#tmNote').textContent=t.note||'';
-  const dl=$('#tmDl');
-  if(t.link&&t.link!=='#'){ dl.href=t.link; dl.onclick=null; }
-  else { dl.href='javascript:void(0)'; dl.onclick=()=>toolDownload(t); }
-  const v=$('#tmVideo'), yid=(typeof ytId==='function')?ytId(t.video):null;
-  if(yid) v.innerHTML=`<iframe src="https://www.youtube.com/embed/${yid}" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>`;
-  else if(t.video) v.innerHTML=`<video src="${t.video}" controls playsinline></video>`;
-  else v.innerHTML=`<div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>Демо-відео скоро буде</div>`;
-  toolModal.classList.add('open');
+function openTool(t){ state.toolId=t.id; state.mode='tool'; render(); }
+function toolHTML(){
+  const t=AE_TOOLS.find(x=>x.id===state.toolId)||AE_TOOLS[0];
+  const yid=(typeof ytId==='function')?ytId(t.video):null;
+  const video = yid
+    ? `<iframe src="https://www.youtube.com/embed/${yid}" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>`
+    : t.video
+    ? `<video src="${t.video}" controls playsinline></video>`
+    : `<div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>Демо-відео скоро буде</div>`;
+  const dl = t.link&&t.link!=='#'
+    ? `<a class="btn" href="${t.link}" target="_blank" rel="noopener">Завантажити&nbsp; <svg class="arr" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 5-5m-5 5-5-5M4 21h16"/></svg></a>`
+    : `<button class="btn" id="toolDlHelp">Завантажити&nbsp; <svg class="arr" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 5-5m-5 5-5-5M4 21h16"/></svg></button>`;
+  return `<div class="stage content-inner">
+    <div class="slide-card tool-page">
+      <button class="btn btn-ghost tp-back" id="toolBack">&larr;&nbsp; Назад</button>
+      <div class="tp-head"><span class="tl-ic">${t.ic}</span><div><h1>${t.name}</h1><small>by ${t.by}</small></div></div>
+      <div class="tp-video">${video}</div>
+      <p class="tp-desc">${t.desc}</p>
+      ${dl}
+    </div>
+  </div>`;
 }
-$('#tmClose').addEventListener('click',()=>toolModal.classList.remove('open'));
-toolModal.addEventListener('click',e=>{ if(e.target===toolModal) toolModal.classList.remove('open'); });
 
 function bind(){
   initTours();
@@ -2684,6 +2658,10 @@ function bind(){
     state.chapter = state.chapter===CHAPTERS.length-1 ? 0 : state.chapter+1;
     state.mode='lesson'; render();
   });
+  const tb=$('#toolBack');
+  if(tb) tb.addEventListener('click',()=>{ state.mode='lesson'; render(); });
+  const tdh=$('#toolDlHelp');
+  if(tdh) tdh.addEventListener('click',()=>toast('Посилання видасть #help-it — внутрішня збірка'));
   initAeTools();
   initDock();
   initTilt();
