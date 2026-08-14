@@ -1418,11 +1418,9 @@
   @media (max-width:860px){ .sidebar{display:none!important} }
 
   /* ===== logo reveal: post-login curtain (o-scs.com style, layered) =====
-     choreography: glow blooms → horizon line draws → the mark assembles on canvas
-     from ~2.5k particles flying in as a left-to-right wave → a scan beam passes
-     down through them → particles hand off to the crisp mark (echoes collapse in,
-     rings breathe out, specular sheen sweeps) → the curtain lifts.
-     every stage overlaps the next, nothing snaps. */
+     choreography: glow blooms → horizon line draws → two echoes converge onto
+     the mark as it pulls into focus → rings breathe out → specular sheen sweeps
+     → the whole curtain lifts. every stage overlaps the next, nothing snaps. */
   #logoReveal{
     position:fixed;inset:0;z-index:90;display:none;
     align-items:center;justify-content:center;
@@ -1438,8 +1436,9 @@
   #logoReveal .lr-ring{
     position:absolute;width:46vmin;height:46vmin;border-radius:50%;pointer-events:none;
     border:1px solid rgba(194,220,146,.34);opacity:0;transform:scale(.22);
+    animation:lrRing 2.7s cubic-bezier(.16,1,.3,1) .85s both;
   }
-  #logoReveal .lr-ring.r2{border-color:rgba(194,220,146,.2)}
+  #logoReveal .lr-ring.r2{animation-delay:1.25s;border-color:rgba(194,220,146,.2)}
   #logoReveal .lr-line{
     position:absolute;height:1px;width:min(760px,64vw);pointer-events:none;
     margin-top:clamp(76px,13vh,120px);                     /* sits under the mark, not behind it */
@@ -1447,29 +1446,17 @@
     transform:scaleX(0);opacity:0;
     animation:lrLine 3s cubic-bezier(.16,1,.3,1) .15s both;
   }
-  #lrCanvas{
-    position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4;
-    opacity:1;transition:opacity .5s cubic-bezier(.16,1,.3,1);
-  }
-  #logoReveal.assembled #lrCanvas{opacity:0}
   .lr-logo{position:relative;display:grid;place-items:center}
   .lr-logo img{height:min(84px,11vw);width:auto;display:block;grid-area:1/1}
-  /* the crisp mark takes over from the particles once they've landed */
   .lr-main{
-    position:relative;z-index:2;opacity:0;filter:blur(9px);transform:scale(1.035);
-    transition:opacity .55s cubic-bezier(.16,1,.3,1),
-               filter .65s cubic-bezier(.16,1,.3,1),
-               transform .65s cubic-bezier(.16,1,.3,1);
+    position:relative;z-index:2;opacity:0;
+    animation:lrMain 2.25s cubic-bezier(.16,1,.3,1) .3s both;
   }
-  #logoReveal.assembled .lr-main{
-    opacity:1;transform:scale(1);
-    filter:blur(0) drop-shadow(0 0 44px rgba(194,220,146,.3));
+  .lr-echo{
+    z-index:1;opacity:0;pointer-events:none;
+    animation:lrEcho 2.1s cubic-bezier(.16,1,.3,1) .25s both;
   }
-  .lr-echo{z-index:1;opacity:0;pointer-events:none}
-  #logoReveal.assembled .lr-echo{animation:lrEcho 1.5s cubic-bezier(.16,1,.3,1) .05s both}
-  #logoReveal.assembled .lr-echo.e2{animation-name:lrEcho2;animation-delay:.18s}
-  #logoReveal.assembled .lr-ring{animation:lrRing 2.5s cubic-bezier(.16,1,.3,1) 0s both}
-  #logoReveal.assembled .lr-ring.r2{animation-delay:.4s}
+  .lr-echo.e2{animation-name:lrEcho2;animation-delay:.42s}
   .lr-sheen{
     z-index:3;opacity:0;pointer-events:none;
     filter:brightness(2.7) saturate(.25);
@@ -1477,8 +1464,8 @@
             mask-image:linear-gradient(104deg,transparent 40%,#000 47%,#000 53%,transparent 60%);
     -webkit-mask-size:260% 100%;         mask-size:260% 100%;
     -webkit-mask-repeat:no-repeat;       mask-repeat:no-repeat;
+    animation:lrSheen 1.5s cubic-bezier(.45,0,.25,1) 1.5s both;
   }
-  #logoReveal.assembled .lr-sheen{animation:lrSheen 1.45s cubic-bezier(.45,0,.25,1) .3s both}
   @keyframes lrGlow{0%{opacity:0;transform:scale(.35)}55%{opacity:1}100%{opacity:.9;transform:scale(1)}}
   @keyframes lrRing{0%{opacity:0;transform:scale(.22)}20%{opacity:.6}100%{opacity:0;transform:scale(1.6)}}
   @keyframes lrLine{
@@ -1551,7 +1538,6 @@
   <i class="lr-ring"></i>
   <i class="lr-ring r2"></i>
   <i class="lr-line"></i>
-  <canvas id="lrCanvas" aria-hidden="true"></canvas>
   <div class="lr-logo">
     <img class="lr-echo"    src="assets/nvex-logo.png" alt="">
     <img class="lr-echo e2" src="assets/nvex-logo.png" alt="">
@@ -2376,136 +2362,9 @@ $('#loginForm').addEventListener('submit',async e=>{
   await afterLogin(data.user, {playIntro:true});
 });
 
-/* =================== LOGO REVEAL: particle assembly ===================
-   The mark is sampled from the logo PNG into ~2.5k points. Each point flies in
-   from a scattered orbit, staggered by its x so the word builds left-to-right,
-   and a scan beam sweeps down through the swarm as it lands. When the swarm is
-   in place the canvas cross-fades into the real <img>, which then carries the
-   echoes / rings / specular sheen. Falls back to a plain fade if anything here
-   is unavailable, so the narration always starts. */
-const lrp={raf:0,parts:[],t0:0,run:false,ctx:null,cv:null,dpr:1,box:null};
-const LR_EASE=t=>t>=1?1:1-Math.pow(2,-10*t);
-
-function lrSample(img,rect){
-  const w=Math.max(1,Math.round(rect.width)), h=Math.max(1,Math.round(rect.height));
-  const off=document.createElement('canvas');
-  off.width=w; off.height=h;
-  const oc=off.getContext('2d',{willReadFrequently:true});
-  oc.drawImage(img,0,0,w,h);
-  let d;
-  try{ d=oc.getImageData(0,0,w,h).data; }catch(_){ return []; }
-  const step=Math.max(3,Math.round(w/165));      // ~2.5k points whatever the size
-  const parts=[];
-  for(let y=0;y<h;y+=step){
-    for(let x=0;x<w;x+=step){
-      if(d[(y*w+x)*4+3]<120) continue;           // transparent → not part of the mark
-      const tx=rect.left+x, ty=rect.top+y;
-      const ang=Math.random()*Math.PI*2, dist=240+Math.random()*580;
-      parts.push({
-        x:tx, y:ty,
-        sx:tx+Math.cos(ang)*dist, sy:ty+Math.sin(ang)*dist*.62,
-        d:(x/w)*.5+Math.random()*.16,            // left-to-right build wave
-        dur:1+Math.random()*.34
-      });
-    }
-  }
-  return parts;
-}
-function lrResize(){
-  if(!lrp.cv) return;
-  lrp.dpr=Math.min(2,devicePixelRatio||1);
-  lrp.cv.width=Math.round(innerWidth*lrp.dpr);
-  lrp.cv.height=Math.round(innerHeight*lrp.dpr);
-}
-function lrFrame(now){
-  if(!lrp.run) return;
-  lrp.raf=requestAnimationFrame(lrFrame);
-  const t=(now-lrp.t0)/1000, ctx=lrp.ctx;
-  ctx.setTransform(lrp.dpr,0,0,lrp.dpr,0,0);
-  ctx.clearRect(0,0,innerWidth,innerHeight);
-  // scan beam runs down through the swarm while it is still landing
-  const b=lrp.box, scanT=(t-1.15)/.85;
-  const scanY=(scanT>0&&scanT<1) ? b.top-18+(b.height+36)*scanT : null;
-  const hot=[];
-  ctx.fillStyle='#C2DC92';
-  for(let i=0;i<lrp.parts.length;i++){
-    const p=lrp.parts[i];
-    const lt=(t-p.d)/p.dur;
-    if(lt<=0) continue;
-    const e=LR_EASE(lt);
-    const x=p.sx+(p.x-p.sx)*e, y=p.sy+(p.y-p.sy)*e;
-    const s=2.7-1.3*e;
-    if(scanY!==null && Math.abs(y-scanY)<13 && e>.35){ hot.push([x,y,s]); continue; }
-    ctx.globalAlpha=Math.min(1,e*1.3)*.92;
-    ctx.fillRect(x,y,s,s);
-  }
-  if(hot.length){                                 // beam-lit points flare white
-    ctx.globalAlpha=1; ctx.fillStyle='#F2FBE2';
-    for(const [x,y,s] of hot) ctx.fillRect(x,y,s+.7,s+.7);
-  }
-  ctx.globalAlpha=1;
-}
-function lrStop(){ lrp.run=false; cancelAnimationFrame(lrp.raf); removeEventListener('resize',lrResize); }
-
-function playLogoReveal(done){
-  const rv=$('#logoReveal');
-  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(!rv){ setTimeout(done,300); return; }
-
-  // hand the curtain back and start the narration
-  const finish=(holdMs,outMs)=>{
-    setTimeout(()=>rv.classList.add('out'),holdMs);
-    setTimeout(()=>{ lrStop(); rv.classList.remove('run','out','assembled'); done(); },holdMs+outMs);
-  };
-
-  rv.classList.remove('out','assembled');
-  rv.classList.add('run');
-
-  if(reduce){ rv.classList.add('assembled'); finish(1200,400); return; }
-
-  const cv=$('#lrCanvas'), img=rv.querySelector('.lr-main');
-  const ctx=cv&&cv.getContext('2d');
-  if(!ctx||!img){ rv.classList.add('assembled'); finish(1800,1050); return; }
-
-  // measure only once the curtain is displayed, so the mark has a real box
-  requestAnimationFrame(()=>{
-    const rect=img.getBoundingClientRect();
-    const build=()=>{
-      const parts=rect.width ? lrSample(img,rect) : [];
-      if(!parts.length){                          // sampling blocked → straight cross-fade
-        rv.classList.add('assembled'); finish(1800,1050); return;
-      }
-      lrp.cv=cv; lrp.ctx=ctx; lrp.parts=parts; lrp.box=rect;
-      lrResize(); addEventListener('resize',lrResize);
-      lrp.run=true; lrp.t0=performance.now();
-      lrp.raf=requestAnimationFrame(lrFrame);
-      // slowest point lands at ~max(delay)+dur ≈ 2.0s → hand over just after
-      setTimeout(()=>rv.classList.add('assembled'),2100);
-      finish(3900,1050);                          // sheen finishes ~3.85s, then lift
-    };
-    if(img.complete && img.naturalWidth) build();
-    else img.addEventListener('load',build,{once:true});
-  });
-}
-
 /* --- shared post-login flow --- */
 async function afterLogin(user, {playIntro}={}){
   NVEX.user=user;
-  // The curtain goes up before we touch the network, so the click never lands on
-  // a frozen form — the profile/progress fetch happens behind the reveal.
-  let curtain=null, startNarration=null;
-  if(playIntro){
-    show('#intro'); orbAudioHook();
-    // unlock audio while we're still inside the login gesture, then start it as the curtain lifts
-    const unlocked=audio.play().then(()=>{ audio.pause(); audio.currentTime=0; return true; }).catch(()=>false);
-    startNarration=async()=>{
-      const ok=await unlocked;
-      audio.play().then(()=>$('#intro').classList.add('playing'))
-        .catch(()=>$('#intro').classList.add('done'));
-      if(!ok) $('#intro').classList.add('done');
-    };
-    curtain=new Promise(res=>playLogoReveal(res));
-  }
   try{
     const { data:prof } = await sb.from('profiles').select('role,full_name').eq('id',user.id).single();
     NVEX.role = prof?.role || 'employee';
@@ -2513,8 +2372,23 @@ async function afterLogin(user, {playIntro}={}){
   document.body.classList.toggle('admin', NVEX.role==='admin');
   await loadProgress();
   if(playIntro){
-    await curtain;              // reveal always finishes before the voice comes in
-    startNarration();
+    show('#intro'); orbAudioHook();
+    // unlock audio while we're still inside the login gesture, then start it as the curtain lifts
+    const unlocked=audio.play().then(()=>{ audio.pause(); audio.currentTime=0; return true; }).catch(()=>false);
+    const startNarration=async()=>{
+      const ok=await unlocked;
+      audio.play().then(()=>$('#intro').classList.add('playing'))
+        .catch(()=>$('#intro').classList.add('done'));
+      if(!ok) $('#intro').classList.add('done');
+    };
+    const rv=$('#logoReveal');
+    if(!rv || matchMedia('(prefers-reduced-motion: reduce)').matches){
+      setTimeout(startNarration,700);
+    } else {
+      rv.classList.remove('out'); rv.classList.add('run');
+      setTimeout(()=>rv.classList.add('out'),3250);            // sheen has cleared the mark
+      setTimeout(()=>{ rv.classList.remove('run','out'); startNarration(); },4200);
+    }
   } else {
     show('#onboarding');
     // F5 on an open session → stay exactly where you were.
