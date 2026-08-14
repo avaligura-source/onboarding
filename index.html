@@ -1427,6 +1427,47 @@
     background:#0A0E0A;
   }
   #logoReveal.run{display:flex}
+  /* dotted tech grid, same language as the intro screen, breathing in behind everything */
+  #logoReveal .lr-grid{
+    position:absolute;inset:0;pointer-events:none;opacity:0;
+    background-image:radial-gradient(rgba(194,220,146,.42) 1.2px,transparent 1.2px);
+    background-size:23px 23px;
+    -webkit-mask-image:radial-gradient(circle at 50% 50%,#000 16%,rgba(0,0,0,.45) 46%,transparent 72%);
+            mask-image:radial-gradient(circle at 50% 50%,#000 16%,rgba(0,0,0,.45) 46%,transparent 72%);
+    animation:lrGrid 3.4s cubic-bezier(.16,1,.3,1) .08s both;
+  }
+  /* a bright arc orbiting the mark — a single sweep of light on an invisible ring */
+  #logoReveal .lr-arc{
+    position:absolute;width:56vmin;height:56vmin;border-radius:50%;pointer-events:none;opacity:0;
+    background:conic-gradient(from 0turn,transparent 0turn,rgba(194,220,146,.55) .05turn,transparent .17turn);
+    -webkit-mask:radial-gradient(circle,transparent 49.1%,#000 49.6%,#000 50.4%,transparent 50.9%);
+            mask:radial-gradient(circle,transparent 49.1%,#000 49.6%,#000 50.4%,transparent 50.9%);
+    animation:lrArcIn 1.2s ease-out .65s both, lrArcSpin 5s linear .65s both;
+  }
+  /* corner brackets framing the mark: one bordered box, masked down to its corners */
+  #logoReveal .lr-frame{
+    position:absolute;width:min(640px,58vw);height:clamp(124px,21vh,186px);
+    border:1px solid rgba(194,220,146,.5);border-radius:5px;pointer-events:none;opacity:0;
+    /* shorthands first — they reset mask-composite, so it must be declared after */
+    -webkit-mask-image:linear-gradient(90deg,#000 0 17%,transparent 17% 83%,#000 83% 100%),
+                       linear-gradient(0deg,#000 0 28%,transparent 28% 72%,#000 72% 100%);
+            mask-image:linear-gradient(90deg,#000 0 17%,transparent 17% 83%,#000 83% 100%),
+                       linear-gradient(0deg,#000 0 28%,transparent 28% 72%,#000 72% 100%);
+    -webkit-mask-composite:source-in;
+            mask-composite:intersect;
+    animation:lrFrame 2.7s cubic-bezier(.16,1,.3,1) .9s both;
+  }
+  /* the mark lands → a flare rips across the screen through it */
+  #logoReveal .lr-flare{
+    position:absolute;height:2px;width:120vw;pointer-events:none;opacity:0;filter:blur(1px);
+    background:linear-gradient(90deg,transparent,rgba(242,251,226,.92) 48%,transparent);
+    animation:lrFlare 1.15s cubic-bezier(.3,0,.2,1) 1.3s both;
+  }
+  @keyframes lrGrid{0%{opacity:0;transform:scale(1.14)}40%{opacity:.6}100%{opacity:.3;transform:scale(1)}}
+  @keyframes lrArcIn{0%{opacity:0}100%{opacity:.9}}
+  @keyframes lrArcSpin{to{transform:rotate(360deg)}}
+  @keyframes lrFrame{0%{opacity:0;transform:scale(1.16)}45%{opacity:.9}100%{opacity:.5;transform:scale(1)}}
+  @keyframes lrFlare{0%{opacity:0;transform:scaleX(.15)}28%{opacity:.95}100%{opacity:0;transform:scaleX(1.45)}}
   #logoReveal .lr-glow{
     position:absolute;width:78vmin;height:78vmin;border-radius:50%;pointer-events:none;
     background:radial-gradient(circle,rgba(194,220,146,.16),rgba(124,164,87,.05) 42%,transparent 68%);
@@ -1502,9 +1543,12 @@
     100%{opacity:0;transform:scale(1.07);filter:blur(7px)}
   }
   @media (prefers-reduced-motion: reduce){
-    #logoReveal .lr-glow,#logoReveal .lr-ring,#logoReveal .lr-line,
+    #logoReveal .lr-glow,#logoReveal .lr-ring,#logoReveal .lr-line,#logoReveal .lr-grid,
+    #logoReveal .lr-arc,#logoReveal .lr-frame,#logoReveal .lr-flare,
     .lr-main,.lr-echo,.lr-sheen{animation:none!important;opacity:1;transform:none;filter:none}
-    #logoReveal .lr-ring,#logoReveal .lr-line,.lr-echo,.lr-sheen{opacity:0}
+    #logoReveal .lr-ring,#logoReveal .lr-line,#logoReveal .lr-arc,
+    #logoReveal .lr-flare,.lr-echo,.lr-sheen{opacity:0}
+    #logoReveal .lr-grid{opacity:.22} #logoReveal .lr-frame{opacity:.4}
     #logoReveal.out{animation:none;opacity:0;transition:opacity .35s ease}
   }
 
@@ -1534,10 +1578,14 @@
 
 <!-- logo reveal curtain: plays between login and the narration -->
 <div id="logoReveal" aria-hidden="true">
+  <i class="lr-grid"></i>
   <i class="lr-glow"></i>
+  <i class="lr-arc"></i>
   <i class="lr-ring"></i>
   <i class="lr-ring r2"></i>
+  <i class="lr-frame"></i>
   <i class="lr-line"></i>
+  <i class="lr-flare"></i>
   <div class="lr-logo">
     <img class="lr-echo"    src="assets/nvex-logo.png" alt="">
     <img class="lr-echo e2" src="assets/nvex-logo.png" alt="">
@@ -2365,6 +2413,27 @@ $('#loginForm').addEventListener('submit',async e=>{
 /* --- shared post-login flow --- */
 async function afterLogin(user, {playIntro}={}){
   NVEX.user=user;
+  // The curtain goes up before we touch the network, so the click never lands on
+  // a frozen form — the profile/progress fetch happens behind the reveal.
+  let curtain=null, startNarration=null;
+  if(playIntro){
+    show('#intro'); orbAudioHook();
+    // unlock audio while we're still inside the login gesture, then start it as the curtain lifts
+    const unlocked=audio.play().then(()=>{ audio.pause(); audio.currentTime=0; return true; }).catch(()=>false);
+    startNarration=async()=>{
+      const ok=await unlocked;
+      audio.play().then(()=>$('#intro').classList.add('playing'))
+        .catch(()=>$('#intro').classList.add('done'));
+      if(!ok) $('#intro').classList.add('done');
+    };
+    curtain=new Promise(res=>{
+      const rv=$('#logoReveal');
+      if(!rv || matchMedia('(prefers-reduced-motion: reduce)').matches){ setTimeout(res,700); return; }
+      rv.classList.remove('out'); rv.classList.add('run');
+      setTimeout(()=>rv.classList.add('out'),3250);            // sheen has cleared the mark
+      setTimeout(()=>{ rv.classList.remove('run','out'); res(); },4200);
+    });
+  }
   try{
     const { data:prof } = await sb.from('profiles').select('role,full_name').eq('id',user.id).single();
     NVEX.role = prof?.role || 'employee';
@@ -2372,23 +2441,8 @@ async function afterLogin(user, {playIntro}={}){
   document.body.classList.toggle('admin', NVEX.role==='admin');
   await loadProgress();
   if(playIntro){
-    show('#intro'); orbAudioHook();
-    // unlock audio while we're still inside the login gesture, then start it as the curtain lifts
-    const unlocked=audio.play().then(()=>{ audio.pause(); audio.currentTime=0; return true; }).catch(()=>false);
-    const startNarration=async()=>{
-      const ok=await unlocked;
-      audio.play().then(()=>$('#intro').classList.add('playing'))
-        .catch(()=>$('#intro').classList.add('done'));
-      if(!ok) $('#intro').classList.add('done');
-    };
-    const rv=$('#logoReveal');
-    if(!rv || matchMedia('(prefers-reduced-motion: reduce)').matches){
-      setTimeout(startNarration,700);
-    } else {
-      rv.classList.remove('out'); rv.classList.add('run');
-      setTimeout(()=>rv.classList.add('out'),3250);            // sheen has cleared the mark
-      setTimeout(()=>{ rv.classList.remove('run','out'); startNarration(); },4200);
-    }
+    await curtain;              // reveal always finishes before the voice comes in
+    startNarration();
   } else {
     show('#onboarding');
     // F5 on an open session → stay exactly where you were.
