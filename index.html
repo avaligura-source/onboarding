@@ -1417,6 +1417,38 @@
   }
   @media (max-width:860px){ .sidebar{display:none!important} }
 
+  /* ===== landing: gradient bloom + interactive 3D logo (pre-login) ===== */
+  #landing{background:#0B100B;overflow:hidden}
+  #landCanvas{
+    position:absolute;left:-6%;top:-6%;width:112%;height:112%;
+    filter:blur(46px) saturate(1.55) brightness(1.06);pointer-events:none;
+  }
+  #landText{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .land-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;perspective:1100px}
+  .l3d{position:relative;transform-style:preserve-3d;will-change:transform}
+  .l3d img{display:block;height:min(96px,13vw);width:auto;user-select:none;-webkit-user-drag:none}
+  .l3d img+img{position:absolute;left:0;top:0}
+  .l3d-shadow{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:60vmin;height:60vmin;border-radius:50%;pointer-events:none;
+    background:radial-gradient(circle,rgba(11,16,11,.55),transparent 62%);
+  }
+  #landing .land-in{opacity:0;animation:landIn 1.2s var(--ease-out) .5s forwards}
+  @keyframes landIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .land-hint{
+    position:absolute;left:0;right:0;bottom:7vh;text-align:center;pointer-events:none;
+    font:700 11px/1.6 ui-monospace,'SF Mono',Menlo,monospace;letter-spacing:.16em;
+    text-transform:uppercase;color:rgba(244,246,241,.5);
+    opacity:0;animation:landIn 1.2s var(--ease-out) 1.6s forwards;
+  }
+  .land-hint b{color:#C2DC92}
+  .land-hint .lh-dot{margin:0 10px;opacity:.4}
+  #landing.leave{animation:landOut .6s var(--ease-in-out) forwards}
+  @keyframes landOut{to{opacity:0;filter:brightness(1.6)}}
+  @media (prefers-reduced-motion: reduce){
+    #landing .land-in,.land-hint{animation:none;opacity:1}
+    #landing.leave{animation:none;opacity:0;transition:opacity .3s ease}
+  }
   /* ===== §14 reduced motion & accessibility (apple-design) ===== */
   @media (prefers-reduced-motion: reduce){
     .cube,.dec-cube,.halo,.orbit,.od,.spark,.eq span,.intro-orb,.intro-video,
@@ -1441,8 +1473,19 @@
 </head>
 <body>
 
+<!-- ============ STEP 0: LANDING (gradient bloom + 3D logo) ============ -->
+<section class="screen active" id="landing">
+  <canvas id="landCanvas" aria-hidden="true"></canvas>
+  <canvas id="landText" aria-hidden="true"></canvas>
+  <div class="land-stage land-in">
+    <div class="l3d-shadow"></div>
+    <div class="l3d" id="l3d"></div>
+  </div>
+  <p class="land-hint"><b>Рухай курсором</b><span class="lh-dot">·</span>натисни будь-де, щоб розпочати</p>
+</section>
+
 <!-- ============ STEP 1: LOGIN ============ -->
-<section class="screen active" id="login">
+<section class="screen" id="login">
   <div class="aurora"><i></i><i></i><i></i><i></i></div>
   <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
   <div class="cube" data-cube="orange" style="width:110px;top:7%;left:12%;--rot:-14deg;--dur:13s;filter:blur(2px);opacity:.85"></div>
@@ -1560,7 +1603,7 @@
     <div class="eq"><span></span><span></span><span></span><span></span><span></span></div>
     <div class="subs" id="subs" aria-live="polite"></div>
     <p class="sound-hint"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14v-3a9 9 0 0 1 18 0v3"/><path d="M21 17a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h3zM3 17a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2H3z"/></svg><b>Увімкніть звук</b><span class="sep">·</span>щоб нічого не пропустити</p>
-    <button class="btn btn-start btn-shimmer" id="startBtn">Розпочати онбординг
+    <button class="btn btn-start btn-shimmer" id="startBtn"><span id="startLabel">Увійти</span>
       <span class="bs-enter">Enter&nbsp;&#8629;</span>
     </button>
 
@@ -2160,6 +2203,7 @@ function show(id){
   $(id).classList.add('active');
   document.body.classList.toggle('in-app', id==='#onboarding');
   if(id==='#intro') orbStart(); else orbStop();
+  if(id!=='#landing'&&typeof landingStop==='function') landingStop();
 }
 function toast(msg){
   const t=$('#toast'); t.textContent=msg; t.classList.add('show');
@@ -2254,11 +2298,11 @@ $('#loginForm').addEventListener('submit',async e=>{
     toast(error.message.match(/invalid/i) ? 'Невірна пошта або пароль' : 'Не вдалося увійти: '+error.message);
     return;
   }
-  await afterLogin(data.user, {playIntro:true});
+  await afterLogin(data.user);
 });
 
-/* --- shared post-login flow --- */
-async function afterLogin(user, {playIntro}={}){
+/* --- shared post-login flow: straight into the app --- */
+async function afterLogin(user){
   NVEX.user=user;
   try{
     const { data:prof } = await sb.from('profiles').select('role,full_name').eq('id',user.id).single();
@@ -2266,23 +2310,15 @@ async function afterLogin(user, {playIntro}={}){
   }catch(_){ NVEX.role='employee'; }
   document.body.classList.toggle('admin', NVEX.role==='admin');
   await loadProgress();
-  if(playIntro){
-    show('#intro'); orbAudioHook();
-    setTimeout(()=>{
-      audio.play().then(()=>$('#intro').classList.add('playing'))
-        .catch(()=>$('#intro').classList.add('done'));
-    },900);
-  } else {
-    show('#onboarding');
-    // F5 on an open session → stay exactly where you were.
-    // Opening the link anew (new tab / bookmark / closed-and-reopened) → start from the top.
-    const nav=(performance.getEntriesByType('navigation')[0]||{}).type;
-    const isReload = nav==='reload';
-    if(isReload && restoreView()){ /* stayed put */ }
-    else {
-      try{ localStorage.removeItem(VIEW_KEY); }catch(_){}
-      state.chapter=0; state.mode='lesson'; render();
-    }
+  show('#onboarding');
+  // F5 on an open session → stay exactly where you were.
+  // Opening the link anew (new tab / bookmark / closed-and-reopened) → start from the top.
+  const nav=(performance.getEntriesByType('navigation')[0]||{}).type;
+  const isReload = nav==='reload';
+  if(isReload && restoreView()){ /* stayed put */ }
+  else {
+    try{ localStorage.removeItem(VIEW_KEY); }catch(_){}
+    state.chapter=0; state.mode='lesson'; render();
   }
 }
 
@@ -2311,23 +2347,189 @@ async function saveProgress(chapter, passed, score, total){
 }
 async function logout(){ try{ await sb.auth.signOut(); }catch(_){} location.reload(); }
 
-/* --- on load: a real F5 keeps you in place, opening the link shows the home screen --- */
+/* --- on load: a real F5 keeps you in place, opening the link starts the landing --- */
 (async ()=>{
   try{
     const nav=(performance.getEntriesByType('navigation')[0]||{}).type;
     const { data:{ session } } = await sb.auth.getSession();
-    if(!session) return;                       // not logged in → login screen
-    if(nav==='reload'){ await afterLogin(session.user,{playIntro:false}); return; }
-    // fresh open: stay on the home (login) screen, offer a one-click continue
+    NVEX.session=session||null;
+    if(!session) return;                       // not logged in → landing stays
+    if(nav==='reload'){ await afterLogin(session.user); return; }
+    // fresh open with a session: landing → intro → «Продовжити», plus one-click on the login card
     try{ localStorage.removeItem(VIEW_KEY); }catch(_){}
     const c=$('#continueAs');
     if(c){
       c.querySelector('b').textContent=session.user.email;
       c.hidden=false;
-      c.addEventListener('click',async()=>{ await afterLogin(session.user,{playIntro:true}); });
+      c.addEventListener('click',async()=>{ await afterLogin(session.user); });
     }
   }catch(_){}
 })();
+
+/* =================== LANDING: gradient bloom + 3D logo =================== */
+const land={ctx:null,cv:null,blobs:[],run:false,raf:0,last:0,seed:0,
+  px:.5,py:.45,tx:.5,ty:.45,moved:0,mcv:null,tcv:null,tfont:''};
+const LAND_WORD='ОНБОРДИНГ';
+const LAND_HUES=[  // NVEX palette, cycled along the cursor trail
+  [194,220,146],[240,252,214],[142,196,96],[74,158,112],[168,214,120],[110,178,140]
+];
+function landResize(){
+  if(!land.cv) return;
+  land.cv.width=Math.max(2,Math.round(land.cv.clientWidth/3));
+  land.cv.height=Math.max(2,Math.round(land.cv.clientHeight/3));
+  // reveal mask (low-res alpha) + crisp hidden headline, like the reference's "BEST YOU"
+  if(land.tcv){
+    land.mcv.width=Math.max(2,Math.round(innerWidth/4));
+    land.mcv.height=Math.max(2,Math.round(innerHeight/4));
+    const dpr=Math.min(2,devicePixelRatio||1);
+    land.tcv.width=Math.round(innerWidth*dpr); land.tcv.height=Math.round(innerHeight*dpr);
+    const tx=land.tcv.getContext('2d');
+    let fs=200*dpr;
+    tx.font=`900 ${fs}px "DM Sans",sans-serif`;
+    const w=tx.measureText(LAND_WORD).width;
+    fs=Math.min(fs*(land.tcv.width*.94)/w, land.tcv.height*.6);
+    land.tfont=`900 ${Math.round(fs)}px "DM Sans",sans-serif`;
+  }
+}
+function landSpawn(nx,ny,r,alpha){
+  if(!Number.isFinite(nx)||!Number.isFinite(ny)) return;   // a bad coord would kill the whole loop
+  const hue=LAND_HUES[land.seed++%LAND_HUES.length];
+  land.blobs.push({x:nx,y:ny,r:r*.25,mr:r,c:hue,a:alpha,age:0,life:2600+Math.random()*1400,
+    vx:(Math.random()-.5)*.012,vy:(Math.random()-.5)*.012});
+  if(land.blobs.length>90) land.blobs.splice(0,land.blobs.length-90);
+}
+function landFrame(ts){
+  if(!land.run) return;
+  land.raf=requestAnimationFrame(landFrame);
+  const dt=Math.min(50,ts-(land.last||ts)); land.last=ts;
+  const ctx=land.ctx,W=land.cv.width,H=land.cv.height;
+  const t0=land.t0||(land.t0=ts);
+  const baseA=Math.min(1,(ts-t0)/1800);          // the base field itself blooms in
+  ctx.globalCompositeOperation='source-over';
+  ctx.fillStyle='#0B100B'; ctx.fillRect(0,0,W,H);
+  ctx.globalAlpha=baseA;
+  const drift=Math.sin(ts/6000)*.08;
+  const g1=ctx.createRadialGradient(W*(.22+drift),H*.85,0,W*(.22+drift),H*.85,Math.max(W,H)*.9);
+  g1.addColorStop(0,'rgba(10,62,32,.98)'); g1.addColorStop(1,'rgba(8,44,24,0)');
+  ctx.fillStyle=g1; ctx.fillRect(0,0,W,H);
+  const g2=ctx.createRadialGradient(W*(.8-drift),H*.15,0,W*(.8-drift),H*.15,Math.max(W,H)*.8);
+  g2.addColorStop(0,'rgba(26,78,46,.95)'); g2.addColorStop(1,'rgba(18,56,34,0)');
+  ctx.fillStyle=g2; ctx.fillRect(0,0,W,H);
+  const g3=ctx.createRadialGradient(W*.5,H*.5,0,W*.5,H*.5,Math.max(W,H)*.55);
+  g3.addColorStop(0,'rgba(78,132,72,.4)'); g3.addColorStop(1,'rgba(78,132,72,0)');
+  ctx.fillStyle=g3; ctx.fillRect(0,0,W,H);
+  ctx.globalAlpha=1;
+  ctx.globalCompositeOperation='lighter';
+  for(let i=land.blobs.length-1;i>=0;i--){
+    const b=land.blobs[i]; b.age+=dt;
+    if(b.age>=b.life){ land.blobs.splice(i,1); continue; }
+    const t=b.age/b.life;
+    b.x+=b.vx*dt/16; b.y+=b.vy*dt/16;
+    const r=(b.r+(b.mr-b.r)*Math.min(1,t*2.4))*Math.min(W,H);
+    const a=b.a*(t<.18?t/.18:1-(t-.18)/.82);
+    const g=ctx.createRadialGradient(b.x*W,b.y*H,0,b.x*W,b.y*H,Math.max(2,r));
+    g.addColorStop(0,`rgba(${b.c[0]},${b.c[1]},${b.c[2]},${a.toFixed(3)})`);
+    g.addColorStop(1,`rgba(${b.c[0]},${b.c[1]},${b.c[2]},0)`);
+    ctx.fillStyle=g;
+    ctx.beginPath();ctx.arc(b.x*W,b.y*H,Math.max(2,r),0,7);ctx.fill();
+  }
+  // hidden headline (ref's "BEST YOU"): crisp word, visible only inside the bloom
+  if(land.tcv&&land.tfont){
+    const mx=land.mcv.getContext('2d'), MW=land.mcv.width, MH=land.mcv.height;
+    mx.clearRect(0,0,MW,MH);
+    for(const b of land.blobs){
+      const t=b.age/b.life;
+      const r=(b.r+(b.mr-b.r)*Math.min(1,t*2.4))*Math.min(MW,MH)*1.12;
+      const a=Math.min(1,b.a*(t<.18?t/.18:1-(t-.18)/.82)*2.2);
+      const gm=mx.createRadialGradient(b.x*MW,b.y*MH,0,b.x*MW,b.y*MH,Math.max(2,r));
+      gm.addColorStop(0,`rgba(255,255,255,${a.toFixed(3)})`);
+      gm.addColorStop(1,'rgba(255,255,255,0)');
+      mx.fillStyle=gm;
+      mx.beginPath();mx.arc(b.x*MW,b.y*MH,Math.max(2,r),0,7);mx.fill();
+    }
+    const tx=land.tcv.getContext('2d'), TW=land.tcv.width, TH=land.tcv.height;
+    tx.clearRect(0,0,TW,TH);
+    tx.globalCompositeOperation='source-over';
+    tx.font=land.tfont; tx.textAlign='center'; tx.textBaseline='middle';
+    tx.fillStyle='rgba(255,255,255,.97)';
+    tx.fillText(LAND_WORD,TW/2,TH*.5);
+    tx.globalCompositeOperation='destination-in';
+    tx.drawImage(land.mcv,0,0,MW,MH,0,0,TW,TH);
+  }
+  // 3D logo: ease toward the cursor, plus an idle float
+  land.px+=(land.tx-land.px)*.06; land.py+=(land.ty-land.py)*.06;
+  const idle=(performance.now()-land.moved>2200)?1:0;
+  const bobY=idle?Math.sin(ts/1300)*.035:0, bobX=idle?Math.cos(ts/1700)*.03:0;
+  const l3=$('#l3d');
+  if(l3) l3.style.transform=
+    `rotateY(${(((land.px-.5)*30)+bobX*30).toFixed(2)}deg) rotateX(${(((.5-land.py)*22)+bobY*22).toFixed(2)}deg)`;
+}
+function landingInit(){
+  land.cv=$('#landCanvas');
+  if(!land.cv) return;
+  land.ctx=land.cv.getContext('2d');
+  land.tcv=$('#landText');
+  land.mcv=document.createElement('canvas');
+  landResize(); addEventListener('resize',landResize);
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(landResize); // re-measure once DM Sans is in
+  // build the extruded logo: dark depth layers behind, white face on top
+  const l3=$('#l3d'), LAYERS=12;
+  let html='';
+  for(let i=0;i<LAYERS;i++){
+    const z=(i-(LAYERS-1))*2.2;
+    const bright=i===LAYERS-1?1:(.3+.4*i/LAYERS);
+    const glow=i===LAYERS-1?'drop-shadow(0 12px 34px rgba(11,16,11,.6)) drop-shadow(0 0 26px rgba(194,220,146,.28))':'';
+    html+=`<img src="assets/nvex-logo-white.png" alt="${i===LAYERS-1?'NVEX tech':''}" style="transform:translateZ(${z}px);filter:brightness(${bright}) ${glow}" ${i?'aria-hidden="true"':''}>`;
+  }
+  l3.innerHTML=html;
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce){ // static soft gradient + faint headline, no loop
+    const g=land.ctx.createRadialGradient(land.cv.width/2,land.cv.height/2,0,land.cv.width/2,land.cv.height/2,land.cv.width/1.4);
+    g.addColorStop(0,'rgba(46,91,51,.9)');g.addColorStop(.55,'rgba(8,53,27,.85)');g.addColorStop(1,'#0B100B');
+    land.ctx.fillStyle=g;land.ctx.fillRect(0,0,land.cv.width,land.cv.height);
+    const paint=()=>{ if(!land.tfont) return;
+      const tx=land.tcv.getContext('2d');
+      tx.clearRect(0,0,land.tcv.width,land.tcv.height);
+      tx.font=land.tfont; tx.textAlign='center'; tx.textBaseline='middle';
+      tx.fillStyle='rgba(255,255,255,.16)';
+      tx.fillText(LAND_WORD,land.tcv.width/2,land.tcv.height*.5); };
+    paint();
+    if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{ landResize(); paint(); });
+    return;
+  }
+  // load-in bloom: colours flower out from the centre, like the reference
+  const seq=[[.5,.45,.55,.62],[.38,.6,.46,.55],[.64,.32,.44,.5],[.24,.34,.4,.44],[.78,.6,.42,.44],[.5,.78,.38,.36],[.14,.7,.34,.32],[.88,.24,.34,.32]];
+  seq.forEach((s,i)=>setTimeout(()=>landSpawn(s[0],s[1],s[2],s[3]),200+i*230));
+  land.run=true; land.raf=requestAnimationFrame(landFrame);
+}
+addEventListener('pointermove',e=>{
+  if(!$('#landing').classList.contains('active')) return;
+  land.tx=e.clientX/innerWidth; land.ty=e.clientY/innerHeight; land.moved=performance.now();
+  if(!land._thr||performance.now()-land._thr>70){
+    land._thr=performance.now();
+    landSpawn(land.tx+(Math.random()-.5)*.06, land.ty+(Math.random()-.5)*.06, .18+Math.random()*.16, .5);
+  }
+},{passive:true});
+function landingStop(){ land.run=false; cancelAnimationFrame(land.raf); }
+async function startFromLanding(){
+  if(startFromLanding._done) return; startFromLanding._done=true;
+  // audio unlock inside the click, like before
+  orbAudioHook();
+  const unlocked=audio.play().then(()=>{ audio.pause(); audio.currentTime=0; return true; }).catch(()=>false);
+  // farewell burst of colour, then hand over to the narration
+  for(let i=0;i<7;i++) landSpawn(.5+(Math.random()-.5)*.5,.45+(Math.random()-.5)*.5,.4+Math.random()*.25,.4);
+  $('#landing').classList.add('leave');
+  setTimeout(async()=>{
+    landingStop();
+    show('#intro');
+    const ok=await unlocked;
+    audio.play().then(()=>$('#intro').classList.add('playing'))
+      .catch(()=>$('#intro').classList.add('done'));
+    if(!ok) $('#intro').classList.add('done');
+  },600);
+}
+$('#landing').addEventListener('click',startFromLanding);
+landingInit();
 /* --- Composing orb (thinking-orbs "ribbon" mode, NVEX-tinted, audio-reactive) --- */
 const orb={t:0,last:0,lvl:0,kick:0,raf:0,analyser:null,fdata:null};
 function fibDir(i,n){
@@ -2498,6 +2700,8 @@ function updateSubs(){
 audio.addEventListener('timeupdate',updateSubs);
 function finishIntro(){
   if(finishIntro._done) return; finishIntro._done=true;
+  const lab=$('#startLabel');
+  if(lab) lab.textContent=NVEX.session?'Продовжити':'Увійти';
   $('#intro').classList.remove('playing');
   setTimeout(()=>$('#intro').classList.add('done'),400);
 }
@@ -2510,13 +2714,15 @@ audio.addEventListener('timeupdate',()=>{
   if(audio.duration&&audio.currentTime>=audio.duration-0.12) finishIntro();
 });
 
-/* =================== INTRO → ONBOARDING =================== */
+/* =================== INTRO → LOGIN / APP =================== */
 addEventListener('keydown',e=>{
-  if(e.key==='Enter'&&$('#intro').classList.contains('active')&&$('#intro').classList.contains('done')) $('#startBtn').click();
+  if(e.key!=='Enter') return;
+  if($('#landing').classList.contains('active')){ startFromLanding(); return; }
+  if($('#intro').classList.contains('active')&&$('#intro').classList.contains('done')) $('#startBtn').click();
 });
-$('#startBtn').addEventListener('click',()=>{
-  show('#onboarding');
-  render();
+$('#startBtn').addEventListener('click',async()=>{
+  if(NVEX.session){ await afterLogin(NVEX.session.user); }
+  else show('#login');
 });
 
 /* =================== PROGRESS =================== */
