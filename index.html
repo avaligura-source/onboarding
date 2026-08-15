@@ -2424,20 +2424,22 @@ async function saveProgress(chapter, passed, score, total){
 }
 async function logout(){ try{ await sb.auth.signOut(); }catch(_){} location.reload(); }
 
-/* --- on load: a real F5 keeps you in place, opening the link shows the home screen --- */
+/* --- on load: entering the app is ALWAYS an explicit action.
+   A live session never auto-enters — even on F5 — it only offers a one-click
+   "continue as X" on the login screen. Clicking it after a real reload restores
+   your exact spot; on a fresh open it replays the intro from the top. --- */
 (async ()=>{
   try{
     const nav=(performance.getEntriesByType('navigation')[0]||{}).type;
+    const isReload = nav==='reload';
     const { data:{ session } } = await sb.auth.getSession();
     if(!session) return;                       // not logged in → login screen
-    if(nav==='reload'){ await afterLogin(session.user,{playIntro:false}); return; }
-    // fresh open: stay on the home (login) screen, offer a one-click continue
-    try{ localStorage.removeItem(VIEW_KEY); }catch(_){}
+    if(!isReload){ try{ localStorage.removeItem(VIEW_KEY); }catch(_){} }
     const c=$('#continueAs');
     if(c){
       c.querySelector('b').textContent=session.user.email;
       c.hidden=false;
-      c.addEventListener('click',async()=>{ await afterLogin(session.user,{playIntro:true}); });
+      c.addEventListener('click',async()=>{ await afterLogin(session.user,{playIntro:!isReload}); });
     }
   }catch(_){}
 })();
