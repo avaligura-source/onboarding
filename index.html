@@ -481,12 +481,15 @@
   /* collapse the hint too, so the button docks right under the title instead of hanging low */
   #intro.done .sound-hint{opacity:0;max-height:0;margin-top:-4px;padding-top:0;padding-bottom:0;border-color:transparent;pointer-events:none}
   .sound-hint svg{width:13px;height:13px;stroke:var(--blue)}
-  #startBtn{margin-top:34px;
-    opacity:0;transform:translateY(24px);pointer-events:none;
+  /* fixed final position — the button never travels; it just fades in AFTER the
+     subs/eq/hint above it have collapsed, so it appears already in its spot */
+  #startBtn{margin-top:2px;
+    opacity:0;transform:translateY(12px);pointer-events:none;
     padding:18px 44px;font-size:16px;border-radius:16px;
-    transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.2,1),background var(--t),box-shadow var(--t);
+    transition:opacity .5s ease,transform .5s cubic-bezier(.2,.8,.2,1),background var(--t),box-shadow var(--t);
   }
-  #intro.done #startBtn{opacity:1;transform:none;pointer-events:auto;margin-top:2px;transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.2,1),margin-top .6s var(--ease-in-out),background var(--t),box-shadow var(--t)}
+  #intro.done #startBtn{opacity:1;transform:none;pointer-events:auto;
+    transition:opacity .55s ease .62s,transform .6s cubic-bezier(.2,.8,.2,1) .62s,background var(--t),box-shadow var(--t)}
   #intro.done .eq{opacity:0}
 
   /* ============ ONBOARDING LAYOUT ============ */
