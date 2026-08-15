@@ -25,6 +25,8 @@
     --shadow-sm:0 1px 2px rgba(0,0,0,.35),0 4px 12px rgba(0,0,0,.3);
     --shadow-md:0 2px 6px rgba(0,0,0,.4),0 12px 32px rgba(0,0,0,.35);
     --shadow-lg:0 8px 24px rgba(0,0,0,.45),0 32px 80px rgba(8,53,27,.5);
+    /* San Francisco (SF UI) — native on Apple devices, graceful fallback elsewhere */
+    --sf:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display',system-ui,'Segoe UI',sans-serif;
     --ease-out:cubic-bezier(0.23,1,0.32,1);
     --ease-in-out:cubic-bezier(0.77,0,0.175,1);
     --t:200ms cubic-bezier(0.23,1,0.32,1);
@@ -410,7 +412,8 @@
   #intro.active .intro-orb{opacity:1;transform:none}
   #orbCanvas{width:100%;height:100%;display:block}
   .intro-title{
-    text-align:center;font-size:clamp(34px,4.4vw,48px);font-weight:800;line-height:1.06;letter-spacing:-.025em;text-transform:uppercase;
+    text-align:center;font-family:'Unbounded','DM Sans',sans-serif;
+    font-size:clamp(30px,3.9vw,42px);font-weight:600;line-height:1.1;letter-spacing:-.01em;
     opacity:0;transform:translateY(12px);
     transition:opacity 1s ease .25s,transform 1s cubic-bezier(.2,.8,.2,1) .25s;
   }
@@ -1114,8 +1117,8 @@
   .slide-card{background:var(--paper);border-color:transparent}
   /* one label style shared by the eyebrow and the meta chips beside it */
   .slide-card .eyebrow{
-    color:#4C8A3F;font-family:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
-    font-size:11px;font-weight:700;letter-spacing:.14em;
+    color:#4C8A3F;font-family:var(--sf);
+    font-size:12px;font-weight:600;letter-spacing:.01em;text-transform:none;
   }
   .slide-card .ch-title{color:var(--inkP)}
   .slide-card .t-accent{color:#3E7A2E}
@@ -1198,8 +1201,8 @@
   .ls-meta{display:flex;gap:8px;flex-wrap:wrap}
   .meta-chip{
     padding:6px 12px;border-radius:8px;border:1px solid var(--paper-line);background:var(--paper-2);
-    font:700 11px/1 ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
-    letter-spacing:.14em;color:#4C6B4F;white-space:nowrap;
+    font:600 12px/1 var(--sf);
+    letter-spacing:.01em;color:#4C6B4F;white-space:nowrap;
   }
   /* tighter, product-scale title */
   .slide-card .ch-title{font-size:clamp(22px,2.6vw,30px);line-height:1.12;margin-bottom:14px}
@@ -1301,8 +1304,7 @@
   .sp-info .bar{height:5px;border-radius:99px;background:#223122;overflow:hidden}
   .sp-info .bar i{display:block;height:100%;width:0;background:var(--grad);border-radius:99px;transition:width .5s var(--ease-in-out)}
   .sidebar .side-label{
-    font:700 10px/1 ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
-    letter-spacing:.18em;text-transform:uppercase;color:#5F6F5C;
+    font:600 11.5px/1 var(--sf);letter-spacing:.01em;color:#5F6F5C;text-transform:none;
     /* sits on the 33px content line; negative bottom pulls its list into one group */
     margin:4px 0 -6px 17px;
   }
@@ -1341,7 +1343,7 @@
   .qh-text{max-width:60%}
   .q-hero .ch-title{color:var(--inkP);margin-bottom:10px}
   .q-hero .ch-lead{color:var(--inkP-soft);margin-bottom:0;font-size:14.5px}
-  .q-hero .eyebrow{color:#4C8A3F;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;letter-spacing:.18em;margin-bottom:10px}
+  .q-hero .eyebrow{color:#4C8A3F;font-family:var(--sf);font-size:12px;font-weight:600;letter-spacing:.01em;text-transform:none;margin-bottom:10px}
   .q-art{position:relative;width:250px;height:170px;flex-shrink:0}
   .q-art .orbit{position:absolute;left:50%;top:50%;border:1px solid #CBD9AC;border-radius:50%;transform:translate(-50%,-50%) rotate(-18deg)}
   .q-art .o1{width:240px;height:96px}
@@ -2849,7 +2851,7 @@ function lessonHTML(){
   return `<div class="stage content-inner">
     <div class="slide-card">
       <div class="ls-toolbar">
-        <div class="ls-crumb"><span class="ch-icon sm">${ICONS[c.icon]}</span><span class="eyebrow">0${state.chapter+1} · РОЗДІЛ</span></div>
+        <div class="ls-crumb"><span class="ch-icon sm">${ICONS[c.icon]}</span><span class="eyebrow">0${state.chapter+1} · Розділ</span></div>
         <div class="ls-meta">
           <span class="meta-chip">≈ ${mins} хв читання</span>
           <span class="meta-chip">Тест · ${c.quiz.length} питань</span>
@@ -2889,7 +2891,7 @@ function quizHTML(){
     <div class="q-main">
     <div class="q-hero">
       <div class="qh-text">
-        <div class="eyebrow">0${state.chapter+1} · ПЕРЕВІРКА ЗНАНЬ</div>
+        <div class="eyebrow">0${state.chapter+1} · Перевірка знань</div>
         <h1 class="ch-title">${c.title}</h1>
         <p class="ch-lead">${c.practice?'Виконай практичне завдання і дай відповіді на питання, щоб відкрити наступний розділ.':'Дай відповіді на питання нижче, щоб відкрити наступний розділ.'}</p>
       </div>
