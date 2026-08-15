@@ -451,38 +451,42 @@
     font-size:clamp(11px,1.25vw,15px);line-height:1.5;letter-spacing:.05em;
   }
   .sub-row{display:flex;gap:.5em;justify-content:center;white-space:nowrap}
-  .subs .swm{display:inline-block;overflow:hidden;padding:2px 1px}
+  .subs .swm{display:inline-block;padding:3px 1px}
   .subs .sw{
     display:inline-block;color:var(--ink);opacity:0;
-    transform:translateY(55%);
-    transition:transform .65s var(--ease-out),opacity .65s ease;
+    transform:translateY(.5em);filter:blur(7px);
+    transition:transform .9s var(--ease-out),opacity .9s var(--ease-out),filter .9s var(--ease-out);
   }
-  .subs .sw.on{transform:none;opacity:1}
+  .subs .sw.on{transform:none;opacity:1;filter:blur(0)}
   .subs .sw.key{color:var(--blue);text-shadow:0 0 14px rgba(187,221,136,.3)}
   /* after the narration the empty subs/eq zone collapses — the button docks right under the title */
-  #intro.done .subs{max-height:0;min-height:0;opacity:0;margin:-13px 0;overflow:hidden;pointer-events:none}
+  #intro.done .subs{max-height:0;min-height:0;opacity:0;margin:-13px 0;overflow:hidden;pointer-events:none;
+    filter:blur(8px);transform:translateY(-8px);
+    transition:opacity .7s var(--ease-out),filter .7s var(--ease-out),transform .7s var(--ease-in-out),
+               max-height .6s var(--ease-in-out) .12s,margin .6s var(--ease-in-out) .12s}
   #intro.done .eq{max-height:0;opacity:0;margin:-13px 0;overflow:hidden;transition:max-height .5s var(--ease-in-out),opacity .3s ease,margin .5s var(--ease-in-out)}
   @keyframes subIn{from{opacity:0;transform:translateY(14px);filter:blur(7px)}to{opacity:1;transform:none;filter:blur(0)}}
-  #intro.done .subs{opacity:0;transition:opacity .5s ease;pointer-events:none}
   .sound-hint{
     display:flex;align-items:center;gap:10px;margin-top:-4px;
     font:600 10.5px/1 ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
     letter-spacing:.16em;text-transform:uppercase;color:#5E665C;
     padding:9px 16px;border:1px solid rgba(255,255,255,.07);border-radius:99px;
     background:rgba(255,255,255,.02);
-    opacity:0;transition:opacity .8s ease .2s;
+    opacity:0;transition:opacity .8s ease .2s,max-height .6s var(--ease-in-out),margin .6s var(--ease-in-out),padding .6s var(--ease-in-out);
+    max-height:44px;overflow:hidden;
   }
   .sound-hint b{color:var(--blue);font-weight:600}
   .sound-hint .sep{color:rgba(187,221,136,.35)}
   #intro.playing .sound-hint{opacity:1}
-  #intro.done .sound-hint{opacity:0}
+  /* collapse the hint too, so the button docks right under the title instead of hanging low */
+  #intro.done .sound-hint{opacity:0;max-height:0;margin-top:-4px;padding-top:0;padding-bottom:0;border-color:transparent;pointer-events:none}
   .sound-hint svg{width:13px;height:13px;stroke:var(--blue)}
   #startBtn{margin-top:34px;
     opacity:0;transform:translateY(24px);pointer-events:none;
     padding:18px 44px;font-size:16px;border-radius:16px;
     transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.2,1),background var(--t),box-shadow var(--t);
   }
-  #intro.done #startBtn{opacity:1;transform:none;pointer-events:auto}
+  #intro.done #startBtn{opacity:1;transform:none;pointer-events:auto;margin-top:2px;transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.2,1),margin-top .6s var(--ease-in-out),background var(--t),box-shadow var(--t)}
   #intro.done .eq{opacity:0}
 
   /* ============ ONBOARDING LAYOUT ============ */
@@ -1786,7 +1790,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     </div>
   </div>
 </div>
-<audio id="narration" src="onboarding.mp3?v=2" preload="auto"></audio>
+<audio id="narration" src="onboarding.mp3?v=3" preload="auto"></audio>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
@@ -2567,12 +2571,12 @@ function orbStop(){ if(orb.raf){cancelAnimationFrame(orb.raf); orb.raf=0;} }
 
 /* --- animated karaoke subtitles, synced to narration word timings --- */
 const SUBS=[
-  {s:0.0,e:3.3,w:[["Ласкаво",0.0],["просимо",0.62],["до",1.18],["онбордингу",1.36],["NVEX.",2.22]]},
-  {s:3.5,e:8.75,w:[["Далі",3.5],["ти",3.88],["познайомишся",3.98],["з",4.78],["компанією,",4.88],["основними",5.7],["процесами",6.48],["та",7.2],["правилами",7.48],["роботи.",8.04]]},
-  {s:8.88,e:15.2,w:[["Після",8.88],["кожного",9.28],["розділу",9.76],["на",10.36],["тебе",10.68],["чекатиме",10.88],["короткий",11.54],["тест,",12.04],["щоб",12.66],["закріпити",12.86],["найважливіше.",13.58]]}
+  {s:0.0,e:3.4,w:[["Ласкаво",0.0],["просимо",0.78],["до",1.20],["онбордингу",1.44],["NVEX",2.12],["tech.",2.62]]},
+  {s:3.5,e:8.9,w:[["Далі",3.5],["ти",4.24],["познайомишся",4.34],["з",5.10],["компанією,",5.18],["основними",5.94],["процесами",6.82],["та",7.46],["правилами",7.62],["роботи.",8.20]]},
+  {s:9.14,e:15.2,w:[["Після",9.14],["кожного",9.60],["розділу",10.06],["на",10.58],["тебе",10.72],["чекатиме",10.94],["короткий",11.60],["тест,",12.08],["щоб",12.70],["закріпити",12.98],["найважливіше.",13.64]]}
 ];
 const subsEl=$('#subs');
-const KEY_WORDS=new Set(['NVEX.','компанією,','процесами','тест,','найважливіше.']);
+const KEY_WORDS=new Set(['NVEX','tech.','компанією,','процесами','тест,','найважливіше.']);
 // at most 5 words per row and at most 2 rows → a card shows at most 10 words
 const MAX_ROW=5, MAX_ROWS=2, MAX_CARD=MAX_ROW*MAX_ROWS;
 // always exactly 2 balanced rows (≤5 words each) so the block never changes height
@@ -2603,6 +2607,7 @@ function updateSubs(){
     const row=ws=>`<span class="sub-row">${ws.length?ws.map(([w])=>`<span class="swm"><span class="sw ${KEY_WORDS.has(w)?'key':''}">${w}</span></span>`).join(''):'&nbsp;'}</span>`;
     subsEl.innerHTML=splitRows(words).map(row).join('');   // always 2 rows, ≤5 words each
     subsEl._spans=subsEl.querySelectorAll('.sw');
+    void subsEl.offsetHeight;   // commit the hidden base state so each word's reveal actually transitions
   }
   let wi=-1;
   for(let i=0;i<words.length;i++) if(t>=words[i][1]) wi=i;
