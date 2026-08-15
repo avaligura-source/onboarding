@@ -467,20 +467,20 @@
   #intro.done .eq{max-height:0;opacity:0;margin:-13px 0;overflow:hidden;transition:max-height .5s var(--ease-in-out),opacity .3s ease,margin .5s var(--ease-in-out)}
   @keyframes subIn{from{opacity:0;transform:translateY(14px);filter:blur(7px)}to{opacity:1;transform:none;filter:blur(0)}}
   .sound-hint{
-    display:flex;align-items:center;gap:10px;margin-top:-4px;
-    font:600 10.5px/1 ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
+    display:flex;align-items:center;gap:6.5px;margin-top:-4px;
+    font:600 6.8px/1 ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
     letter-spacing:.16em;text-transform:uppercase;color:#5E665C;
-    padding:9px 16px;border:1px solid rgba(255,255,255,.07);border-radius:99px;
+    padding:5.8px 10.4px;border:1px solid rgba(255,255,255,.07);border-radius:99px;
     background:rgba(255,255,255,.02);
     opacity:0;transition:opacity .8s ease .2s,max-height .6s var(--ease-in-out),margin .6s var(--ease-in-out),padding .6s var(--ease-in-out);
-    max-height:44px;overflow:hidden;
+    max-height:29px;overflow:hidden;
   }
   .sound-hint b{color:var(--blue);font-weight:600}
   .sound-hint .sep{color:rgba(187,221,136,.35)}
   #intro.playing .sound-hint{opacity:1}
   /* collapse the hint too, so the button docks right under the title instead of hanging low */
   #intro.done .sound-hint{opacity:0;max-height:0;margin-top:-4px;padding-top:0;padding-bottom:0;border-color:transparent;pointer-events:none}
-  .sound-hint svg{width:13px;height:13px;stroke:var(--blue)}
+  .sound-hint svg{width:8.5px;height:8.5px;stroke:var(--blue)}
   /* fixed final position — the button never travels; it just fades in AFTER the
      subs/eq/hint above it have collapsed, so it appears already in its spot */
   #startBtn{margin-top:2px;
